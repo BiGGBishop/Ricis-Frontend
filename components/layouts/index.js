@@ -87,6 +87,11 @@ export const AdminSidebarLinks = [
     name: "User Management",
     href: "/admin/user-management",
     icon: NotificationIcon,
+  }, {
+    id: "s7",
+    name: "Classification",
+    href: "/admin/classification",
+    icon: cerificateIcon,
   },
   {
     id: "s5",

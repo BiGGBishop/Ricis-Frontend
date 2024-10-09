@@ -1,22 +1,24 @@
 "use client";
 
-import TableSkeleton from "./skeleton-loaders/TableSkeleton";
-import { cutString } from "@/utils/helpers";
-import { time } from "@/utils/time&dates";
 import { useRouter } from "next/navigation";
 import { useSelector } from "react-redux";
+
+import TableSkeleton from "@/components/skeleton-loaders/TableSkeleton";
 import {
   selectFetchingStates,
   selectTransactons,
 } from "@/store/features/transactionSlice";
+import { cutString } from "@/utils/helpers";
+import { time } from "@/utils/time&dates";
 import { selectUser } from "@/store/features/userSlice";
 import { selectRole } from "@/store/features/userSlice";
 import { EmptyRecord } from "@/svgs";
 
 const tableHeader = [
   "Ref No",
-  "Applicant Name",
-  "Application Name",
+  "Classification",
+  "Category",
+  "Sub Category",
   "Amount Paid",
   "Transaction Status",
   "Date Created",
@@ -26,20 +28,17 @@ const TransactionsTable = () => {
   const router = useRouter();
   const currentUser = useSelector(selectUser);
   const role = useSelector(selectRole);
-//  console.log(role);
+  //  console.log(role);
 
   const transactions = useSelector(selectTransactons);
   const fetchingStates = useSelector(selectFetchingStates);
   const isLoading = fetchingStates?.isLoading;
   // const dispatch = useDispatch();
- //console.log(transactions);
+  //console.log(transactions);
 
-  const openTransactionInvoice = (InvoiceId) => {
+  const openClassification = (classificationId) => {
     if (role !== "USER") {
-      router.push(`/admin/financial-management/${InvoiceId}`);
-    }
-    if (role === "USER") {
-      router.push(`/user/transactions/${InvoiceId}`);
+      router.push(`/admin/classification/${classificationId}`);
     }
   };
 
@@ -62,7 +61,7 @@ const TransactionsTable = () => {
             // const columns = Object.keys(data);
             return (
               <tr
-                onClick={() => openTransactionInvoice(transaction?.id)}
+                onClick={() => openClassification(transaction?.id)}
                 key={transaction.id}
                 className="whitespace-nowrap lg:whitespace-normal bg-white border-b w-full cursor-pointer hover:opacity-70"
               >
@@ -72,15 +71,17 @@ const TransactionsTable = () => {
                 >
                   {cutString(transaction.reference, 10)}
                 </th>
+
                 <td className="px-6 py-4 w-80">
-                  {transaction?.application?.user?.first_name +
-                    " " +
-                    transaction?.application?.user?.last_name}
+                  {transaction?.application?.form?.name}
                 </td>
                 <td className="px-6 py-4 w-80">
                   {transaction?.application?.form?.name}
                 </td>
-                <td className="px-6 py-4 w-80">{transaction?.amount}</td>
+                <td className="px-6 py-4 w-80">
+                  {transaction?.application?.form?.name}
+                </td>
+                <td className="px-6 py-4 w-80">₦ {transaction?.amount}</td>
                 <td className="px-6 py-4">
                   <p
                     className={`px-2.5 py-1.5 text-xs w-fit ${
@@ -96,7 +97,6 @@ const TransactionsTable = () => {
                 </td>
                 <td className="px-6 py-4 space-y-1 flex flex-col items-end ">
                   <p className="">{time.formatDate(transaction?.createdAt)}</p>
-                  <p className="">{time.formatTime(transaction?.createdAt)}</p>
                 </td>
               </tr>
             );
@@ -108,7 +108,7 @@ const TransactionsTable = () => {
     <div className="flex flex-col items-center pt-20 gap-4 bg-white rounded-[4px] h-screen">
       <div className="animate-bounce">{EmptyRecord}</div>
       <h1 className="text-gray-500 lg:text-lg text-sm text-center">
-        You haven't made any transaction yet.
+        You haven't created any classification yet.
       </h1>
     </div>
   );

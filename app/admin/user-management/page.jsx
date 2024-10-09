@@ -16,7 +16,7 @@ const UserManagement = () => {
   });
   const users = data?.data.data;
   const totalPages = data?.data?.meta.total;
-  console.log(users);
+ // console.log(users);
   return (
     <DashboardLayout header="Admin" isSidebarLink={true}>
       <div className="w-full pb-8">

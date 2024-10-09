@@ -1,3 +1,5 @@
+"use client"
+
 import React from "react";
 import FooterText from "./FooterText";
 import { FacebookIcon, LinkedInIcon, TwitterIcon, headerRound } from "../svgs";
