@@ -16,14 +16,18 @@ import { validator } from "@/utils/validator";
 import { normalizeErrors } from "@/utils/helpers";
 import { useRouter } from "next/navigation";
 import { categoryData } from "@/utils/categoryData";
+import Table from "./Table";
+import Paginations from "@/components/Pagination";
 
 const InitialData = {
   role: "",
-  staff_name: "",
-  staff_email: "",
+  status: "",
+  category: "",
+  id: "",
+  createdAt: "",
 };
 
-const CreateClassification = () => {
+const Category = () => {
   const router = useRouter();
 
   const { data, isLoading, isSuccess, error } = useGetFormsQuery("");
@@ -108,11 +112,9 @@ const CreateClassification = () => {
         </div> */}
         <div className="flex flex-col lg:flex-row justify-between w-full m-auto pb-8">
           <div className="w-full">
-            <h1 className="text-black font-bold text-xl">
-              Create Classification
-            </h1>
+            <h1 className="text-black font-bold text-xl">Create Category</h1>
             <p className="text-gray-600 text-sm">
-              create a classification by filling the information below
+              create a category by filling the information below
             </p>
           </div>
           <button
@@ -120,84 +122,40 @@ const CreateClassification = () => {
             className="bg-blue-700 text-white shadow-md rounded-md flex gap-x-4 px-6 whitespace-nowrap items-center justify-center py-2 transform active:scale-75 transition-transform"
           >
             <img className="w-4 h-4" src="/images/transactionIcon.svg" alt="" />
-            <p className="font-medium text-sm">Add Category</p>
+            <p className="font-medium text-sm">Add SubCategory</p>
           </button>
         </div>
         <div className="bg-white w-full m-aut shadow-md rounded-md space-y-8 py-6 pl-6">
           <h1 className="text-[#46B038] font-bold">DETAILS</h1>
           <div className="lg:flex gap-x-6 items-center w-full gap-y-6 lg:flex-wrap">
-            <div className="space-y-2.5">
-              <p className="font-bold">Classification</p>
+            <div className="space-y-2.5 min-w-[350px]">
+              <p className="font-bold">Category</p>
               <input
                 type="text"
                 name="staff_name"
-                className="py-2 px-4 border-[1px] border-solid border-gray-300 rounded-lg"
-                value={formData.staff_name}
+                className="py-2 px-4 border-[1px] border-solid border-gray-300 rounded-lg w-full"
+                value={formData.category}
                 onChange={handleChange}
                 placeholder="Enter Name"
               />
             </div>
-            <div className="max-w-s">
-              <label htmlFor="applicationType" className="block mb-2 font-bold">
-                Category
-              </label>
-              <select
-                name="role"
-                value={formData.role}
-                onChange={handleChange}
-                id="countries"
-                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-              >
-                <option selected disabled>
-                  Select category
-                </option>
-                {categoryData?.map((item) => (
-                  <option key={item?.id} value={item?.value}>
-                    {item?.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className="max-w-s">
+            <div className="max-w-s space-y-2.5 min-w-[200px]">
               <label htmlFor="applicationType" className="block mb-2 font-bold">
                 Sub Category
               </label>
               <select
                 name="role"
-                value={formData.role}
+                value={formData.status}
                 onChange={handleChange}
                 id="countries"
-                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                className="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
               >
                 <option selected disabled>
-                  Select sub-category
+                  Select status
                 </option>
-                <option value="sub-cat-1">Sub Category 1</option>
-                <option value="sub-cat-2">Sub Category 2</option>
+                <option value="sub-cat-1">Enabled</option>
+                <option value="sub-cat-2">Disabled</option>
               </select>
-            </div>
-
-            <div className="space-y-2.5">
-              <p className="font-bold">Application Fee</p>
-              <input
-                type="text"
-                name="staff_email"
-                className="py-2 px-4 border-[1px] border-solid border-gray-300 rounded-lg"
-                placeholder="Enter Amount"
-                value={formData.staff_email}
-                onChange={handleChange}
-              />
-            </div>
-            <div className="space-y-2.5">
-              <p className="font-bold">Incidental Fee</p>
-              <input
-                type="text"
-                name="staff_email"
-                className="py-2 px-4 border-[1px] border-solid border-gray-300 rounded-lg"
-                placeholder="Enter Amount"
-                value={formData.staff_email}
-                onChange={handleChange}
-              />
             </div>
           </div>
 
@@ -208,7 +166,7 @@ const CreateClassification = () => {
             // }}
           >
             <Btn
-              text="Create Classification"
+              text="Create Category"
               loading={creatingStaff}
               loadingMsg="creating category..."
               bgColorClass="bg-[#46B038]"
@@ -225,9 +183,20 @@ const CreateClassification = () => {
             </button> */}
           </div>
         </div>
+        <div className="bg-white rounded-lg space-y-6 p-4">
+          <h1 className="text-black font-bold">Manage Category Information</h1>
+          {/* <Search /> */}
+          <Table />
+        </div>
+        <div className="mt-8">
+          {/* <Paginations
+            pageCount={10}
+            setPage={(event) => dispatch(setPage(event.selected + 1))}
+          /> */}
+        </div>
       </div>
     </DashboardLayout>
   );
 };
 
-export default WithAuth(CreateClassification);
+export default WithAuth(Category);
