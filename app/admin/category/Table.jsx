@@ -15,13 +15,7 @@ import { selectRole } from "@/store/features/userSlice";
 import { EmptyRecord } from "@/svgs";
 import { categoryData } from "@/utils/categoryData";
 
-const tableHeader = [
-  "Ref No",
-  "Category",
-  "Status",
-  "Date Created",
-  "Date Modified",
-];
+const tableHeader = ["Ref No", "Category", "Date Created", "Action"];
 
 const TransactionsTable = () => {
   const router = useRouter();
@@ -71,29 +65,29 @@ const TransactionsTable = () => {
                   {item.id}
                   {/* {cutString(item.id, 10)} */}
                 </th>
-
                 <td className="px-6 py-4 w-100">{item?.label}</td>
-
-                <td className="px-6 py-4">
-                  <p
-                    className={`px-2.5 py-1.5 text-xs w-fit ${
-                      item?.status === "active"
-                        ? "bg-green-100 text-green-700"
-                        : item?.status === "pending"
-                        ? "bg-yellow-100 text-yellow-700"
-                        : "bg-red-100 text-red-600"
-                    } font-medium rounded-3xl`}
-                  >
-                    {item?.status.toUpperCase()}
-                  </p>
-                </td>
+                
                 <td className="px-6 py-4  ">
                   {/* <p className="">{time.formatDate(item?.createdAt)}</p> */}
                   <p className="">{item?.createdAt}</p>
                 </td>
-                <td className="px-6 py-4 space-y-1 flex flex-col items-end ">
-                  {/* <p className="">{time.formatDate(item?.createdAt)}</p> */}
-                  <p className="">{item?.updatedAt}</p>
+                {/* <td className="px-6 py-4 space-y-1 flex flex-col items-end ">
+                  {/* <p className="">{time.formatDate(item?.createdAt)}</p> 
+                </td> */}
+                <td className="px-6 py-4 w-26 gap-5 items-center flex flex-row ">
+                  <img
+                    className="w-5 h-5 text-blue-500"
+                    src="/images/edit1.svg"
+                    alt=""
+                    object
+                    onClick={() => console.log("")}
+                  />
+                  <img
+                    className="w-5 h-5 text-red-500"
+                    src="/images/delete.svg"
+                    alt=""
+                    onClick={() => console.log("delete")}
+                  />
                 </td>
               </tr>
             );

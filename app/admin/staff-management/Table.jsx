@@ -15,6 +15,7 @@ const tableHeader = [
   "Email Address",
   "Satus",
   "Date Applied",
+  "Action",
 ];
 
 const tableData = [
@@ -161,17 +162,37 @@ const Table = () => {
               <tr
                 key={index}
                 className=" border-b-[1px] border-b-gray-300 border-b-solid cursor-pointer hover:opacity-70"
-                onClick={() => {
-                  router.push(
-                    `/admin/staff-management/${data.id}?id=${data.id}`
-                  );
-                }}
               >
-                <td className={`px-6 py-4  `}>{data.name}</td>
-                <td className={`px-6 py-4  `}>
+                <td
+                  className={`px-6 py-4`}
+                  onClick={() => {
+                    router.push(
+                      `/admin/staff-management/${data.id}?id=${data.id}`
+                    );
+                  }}
+                >
+                  {data.name}
+                </td>
+                <td
+                  className={`px-6 py-4`}
+                  onClick={() => {
+                    router.push(
+                      `/admin/staff-management/${data.id}?id=${data.id}`
+                    );
+                  }}
+                >
                   {data.is_admin ? "Admin" : "Staff"}
                 </td>
-                <td className={`px-6 py-4`}>{data.email}</td>
+                <td
+                  className={`px-6 py-4`}
+                  onClick={() => {
+                    router.push(
+                      `/admin/staff-management/${data.id}?id=${data.id}`
+                    );
+                  }}
+                >
+                  {data.email}
+                </td>
                 <td
                   className={`px-6 py-4 ${
                     data?.status.toLowerCase() === "active"
@@ -191,9 +212,29 @@ const Table = () => {
                     {data.status}
                   </div>
                 </td>
-                <td className={`px-6 py-4 `}>
+                <td className={`px-6 py-4 `}  onClick={() => {
+                  router.push(
+                    `/admin/staff-management/${data.id}?id=${data.id}`
+                  );
+                }}>
                   {time.formatDate(data?.created_at)} at{" "}
                   {time.formatTime(data?.created_at)}{" "}
+                </td>
+                <td className={`px-6 py-4 `}>
+                  <span
+                    onClick={() => console.log("suspend or activate")}
+                    className={`px-2.5 py-1.5 text-xs ${
+                      data?.status.toLowerCase() === "active"
+                        ? "bg-red-100 text-red-600"
+                        : data?.status.toLowerCase() === "suspended"
+                        ? "bg-blue-100 text-blue-700"
+                        : "bg-green-100 text-green-700"
+                    } font-medium rounded-3xl`}
+                  >
+                    {data?.status.toLowerCase() === "active"
+                      ? "Suspend"
+                      : "Activate"}
+                  </span>
                 </td>
               </tr>
             );

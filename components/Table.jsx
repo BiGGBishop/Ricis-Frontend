@@ -33,7 +33,7 @@ const tableColumn = [
   "Application Name",
   "Status",
   "Date Applied",
-  "Date Modified",
+  "Action",
 ];
 
 const Table = () => {
@@ -206,13 +206,23 @@ const Table = () => {
                     {application?.isDraft ? "Draft" : application.status}
                   </span>
                 </td>
-                <td className="px-6 py-4 space-y-1 flex flex-col items-end ">
+                <td className="px-6 py-4 space-y-1 ">
                   <p className="">{time.formatDate(application?.created_at)}</p>
                   <p className="">{time.formatTime(application?.created_at)}</p>
                 </td>
-                <td className="px-8 py-4 space-y-1 text-end ">
-                  <p className="">{time.formatDate(application?.updated_at)}</p>
-                  <p className="">{time.formatTime(application?.updated_at)}</p>
+                <td className="px-4 py-4 flex flex-row items-center gap-3 justify-center">
+                  <span
+                    onClick={() => console.log("approve")}
+                    className={`px-2.5 py-1.5 text-xs bg-blue-100 text-blue-700 font-medium rounded-3xl`}
+                  >
+                    Approve
+                  </span>
+                  <span
+                    onClick={() => console.log("feedback")}
+                    className={`px-2.5 py-1.5 text-xs bg-green-100 text-green-700 font-medium rounded-3xl`}
+                  >
+                    Feedback
+                  </span>
                 </td>
               </tr>
             ))

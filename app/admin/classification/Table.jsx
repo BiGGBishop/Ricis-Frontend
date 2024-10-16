@@ -19,9 +19,10 @@ const tableHeader = [
   "Classification",
   "Category",
   "Sub Category",
-  "Amount Paid",
-  "Transaction Status",
+  "Application Fee",
+  "Incidental Fee",
   "Date Created",
+  "Action",
 ];
 
 const TransactionsTable = () => {
@@ -61,7 +62,6 @@ const TransactionsTable = () => {
             // const columns = Object.keys(data);
             return (
               <tr
-                onClick={() => openClassification(transaction?.id)}
                 key={transaction.id}
                 className="whitespace-nowrap lg:whitespace-normal bg-white border-b w-full cursor-pointer hover:opacity-70"
               >
@@ -71,32 +71,55 @@ const TransactionsTable = () => {
                 >
                   {cutString(transaction.reference, 10)}
                 </th>
-
-                <td className="px-6 py-4 w-80">
+                <td
+                  className="px-6 py-4 w-80"
+                  onClick={() => openClassification(transaction?.id)}
+                >
                   {transaction?.application?.form?.name}
                 </td>
-                <td className="px-6 py-4 w-80">
+                <td
+                  className="px-6 py-4 w-80"
+                  onClick={() => openClassification(transaction?.id)}
+                >
                   {transaction?.application?.form?.name}
                 </td>
-                <td className="px-6 py-4 w-80">
+                <td
+                  className="px-6 py-4 w-80"
+                  onClick={() => openClassification(transaction?.id)}
+                >
                   {transaction?.application?.form?.name}
                 </td>
-                <td className="px-6 py-4 w-80">₦ {transaction?.amount}</td>
-                <td className="px-6 py-4">
-                  <p
-                    className={`px-2.5 py-1.5 text-xs w-fit ${
-                      transaction?.status === "CONFIRMED"
-                        ? "bg-green-100 text-green-700"
-                        : transaction?.status === "PENDING"
-                        ? "bg-yellow-100 text-yellow-700"
-                        : "bg-red-100 text-red-600"
-                    } font-medium rounded-3xl`}
-                  >
-                    {transaction?.status}
-                  </p>
+                <td
+                  className="px-6 py-4 w-20"
+                  onClick={() => openClassification(transaction?.id)}
+                >
+                  ₦ {transaction?.amount}
                 </td>
-                <td className="px-6 py-4 space-y-1 flex flex-col items-end ">
+                <td
+                  className="px-6 py-4"
+                  onClick={() => openClassification(transaction?.id)}
+                >
+                  ₦ 5000
+                </td>
+                <td
+                  className="px-6 py-4"
+                  onClick={() => openClassification(transaction?.id)}
+                >
                   <p className="">{time.formatDate(transaction?.createdAt)}</p>
+                </td>
+                <td className="px-6 py-4 w-26 gap-5 items-center flex flex-row ">
+                  <img
+                    className="w-5 h-5 text-blue-500"
+                    src="/images/edit1.svg"
+                    alt=""
+                    onClick={() => openClassification(transaction?.id)}
+                  />
+                  <img
+                    className="w-5 h-5 text-red-500"
+                    src="/images/delete.svg"
+                    alt=""
+                    onClick={() => console.log("delete")}
+                  />
                 </td>
               </tr>
             );
