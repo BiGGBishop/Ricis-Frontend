@@ -64,7 +64,7 @@ export const applicationApi = createApi({
     getSingleApplication: builder.query({
       query(applicationId) {
         return {
-          url: `/application/${applicationId}`,
+          url: `/admin/application/${applicationId}`,
         };
       },
       providesTags: (result, error, id) => [{ type: "Applications", id }],
@@ -72,7 +72,7 @@ export const applicationApi = createApi({
     getAllApplications: builder.query({
       query(param) {
         return {
-          url: "/application",
+          url: "/admin/application",
           params: param,
           // params
         };

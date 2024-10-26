@@ -29,21 +29,19 @@ const EditStaff = () => {
       data: updatedData,
     },
   ] = useUpdateStaffMutation();
-  const forms = data?.data?.forms;
+  const forms = data?.data;
   console.log(data);
   const { data: staffData, refetch } = useGetSingleStaffQuery(staffId);
 
-  const staff = staffData?.data?.staff[0];
-  const status = staff?.status;
-  const isAdmin = staff?.is_admin;
+  const staff = staffData?.data;
+  const status = staff?.user_status;
+  const isAdmin = staff?.userroleId === 1 ? true : false;
   console.log({ status, isAdmin });
   const processable_forms = staff?.processableForms;
   const processable_forms_ids = processable_forms?.map((form) => form.id);
   console.log(staff);
 
-  const [existingFormCategories, setExistingFormCategories] = useState(
-    []
-  );
+  const [existingFormCategories, setExistingFormCategories] = useState([]);
 
   useEffect(() => {
     if (processable_forms_ids?.length > 0) {
@@ -51,16 +49,18 @@ const EditStaff = () => {
     }
   }, [processable_forms]);
 
-    // Function to handle checkbox change
-    const handleExistingCategories = (value) => {
-      // Update the checkedItems array based on the checkbox state
-      if (!existingFormCategories.includes(value)) {
-        setExistingFormCategories([...existingFormCategories, value]);
-        // setSelectedIds([...selectedIds, value]);
-      } else {
-        setExistingFormCategories(existingFormCategories.filter((item) => item !== value));
-      }
-    };
+  // Function to handle checkbox change
+  const handleExistingCategories = (value) => {
+    // Update the checkedItems array based on the checkbox state
+    if (!existingFormCategories.includes(value)) {
+      setExistingFormCategories([...existingFormCategories, value]);
+      // setSelectedIds([...selectedIds, value]);
+    } else {
+      setExistingFormCategories(
+        existingFormCategories.filter((item) => item !== value)
+      );
+    }
+  };
 
   console.log(existingFormCategories);
   console.log(processable_forms_ids);
@@ -88,7 +88,7 @@ const EditStaff = () => {
       setCheckedCategories([...checkedCategories, value]);
       // setSelectedIds([...selectedIds, value]);
     } else {
-      setCheckedCategories(checkedCategories.filter((item) => item !== value));
+      setCheckedCategories(checkedCategories?.filter((item) => item !== value));
     }
   };
 
@@ -109,7 +109,7 @@ const EditStaff = () => {
   };
 
   const updateStaffCurrentStatus = async () => {
-    const updatedStatus = status === "ACTIVE" ? "SUSPENDED" : "ACTIVE";
+    const updatedStatus = status === "approved" ? "suspended" : "approved";
     const payload = { status: updatedStatus };
     console.log(payload);
     await updateStaffStatus({ staffId, payload });
@@ -134,7 +134,7 @@ const EditStaff = () => {
     if (updateStatusSuccess) {
       toast.success(
         `Successfully ${
-          status === "ACTIVE" ? "suspended" : "unsuspended"
+          status === "approved" ? "suspended" : "unsuspended"
         } staff`,
         { autoClose: 5000 }
       );

@@ -50,7 +50,7 @@ export const registrationFormFields = [
   },
   {
     id: "phone",
-    name: "phone",
+    name: "phone_number",
     placeholder: "Enter Phone",
     type: "text",
     label: "Phone",

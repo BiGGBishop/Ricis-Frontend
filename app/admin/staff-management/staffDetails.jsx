@@ -20,7 +20,7 @@ const StaffDetails = ({ staff, staffId }) => {
     return formattedDate;
   };
 
-  const formattedDate = formatDate(staff?.created_at);
+  const formattedDate = formatDate(staff?.createdAt);
 
   return (
     <>
@@ -63,7 +63,7 @@ const StaffDetails = ({ staff, staffId }) => {
           <div className="shadow-md relative flex space-x-4 items-center py-4 px-2 bg-[#3361FF] bg-opacity-40">
             <Avatar />
             <div>
-              <p className="text-sm">{staff?.name}</p>
+              <p className="text-sm">{staff?.full_name}</p>
               <p className="text-sm font-semibold text-gray-700">Staff Name</p>
             </div>
             <img className="w-4 h-4" src="/images/userIcon.svg" alt="" />
@@ -80,7 +80,7 @@ const StaffDetails = ({ staff, staffId }) => {
           <div className="shadow-md relative flex space-x-4 items-center py-4 px-2 bg-[#C40E0E] bg-opacity-20">
             <img className="w-6 h-6" src="/images/fingerprintIcon.svg" alt="" />
             <div className="w-[80%]">
-              <p className="text-sm break-words">{staff?.ref}</p>
+              <p className="text-sm break-words">{staff?.ref_number}</p>
               <p className="text-sm font-semibold text-gray-700">Staff Ref</p>
             </div>
           </div>

@@ -2,6 +2,7 @@
 import { useRouter } from "next/navigation";
 
 const Avatar = ({ currentUser, role }) => {
+
   const firstNameAcr =
     role !== "USER" ? "A" : currentUser?.first_name?.charAt(0);
   const secondNameAcr =

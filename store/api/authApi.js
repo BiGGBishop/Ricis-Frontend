@@ -4,6 +4,7 @@ import {
   registrationUrl,
   requestOTPUrl,
   signInUrl,
+  signInUrlStaff,
   verifyOTPUrl,
 } from "../../lib/configs";
 import { getToken } from "@/utils/authHelpers";
@@ -14,6 +15,7 @@ export const authApi = createApi({
     baseUrl,
     prepareHeaders: (headers, { getState }) => {
       const token = getToken(); // Get the token
+      console.log("token", token);
       if (token) {
         headers.set("Authorization", `Bearer ${token}`); // Set Authorization header
       }
@@ -56,6 +58,16 @@ export const authApi = createApi({
       query(payload) {
         return {
           url: signInUrl,
+          method: "POST",
+          body: payload,
+        };
+      },
+      invalidatesTags: [{ type: "Auth", id: "LIST" }],
+    }),
+    signInStaff: builder.mutation({
+      query(payload) {
+        return {
+          url: signInUrlStaff,
           method: "POST",
           body: payload,
         };
@@ -110,6 +122,7 @@ export const {
   useVerifyOTPMutation,
   useRegisterUserMutation,
   useSignInUserMutation,
+  useSignInStaffMutation,
   useChangePasswordMutation,
   useRequestResetPasswordOTPMutation,
   useVerifyResetPasswordOTPMutation,

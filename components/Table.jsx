@@ -122,7 +122,7 @@ const Table = () => {
 
   if (isLoading) return <TableSkeleton />;
 
-  console.log(applications);
+  console.log("applications", applications);
 
   return applications?.length > 0 ? (
     <div className="relative overflow-x-auto lg:overflow-x-hidden shadow-md sm:rounded-lg">

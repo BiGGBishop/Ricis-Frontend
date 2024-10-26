@@ -1,15 +1,15 @@
 "use client";
 import WithAuth from "@/components/withAuth";
-import { baseUrl } from "@/lib/configs";
-import { getToken } from "@/utils/authHelpers";
-import axios from "axios";
+// import { baseUrl } from "@/lib/configs";
+// import { getToken } from "@/utils/authHelpers";
+// import axios from "axios";
 import { useEffect, useState } from "react";
 import { ClipLoader } from "react-spinners";
 import { toast } from "react-toastify";
 import DashboardLayout from "@/components/layouts/DashboardLayout";
-import { useGetFormsQuery } from "@/store/api/applicationApi";
+// import { useGetFormsQuery } from "@/store/api/applicationApi";
 import useForm from "@/hooks/useForm";
-import { Checkbox } from "@/components/ui/checkbox";
+// import { Checkbox } from "@/components/ui/checkbox";
 import Btn from "@/components/Btn";
 import { useCreateStaffMutation } from "@/store/api/userApi";
 import { validator } from "@/utils/validator";
@@ -17,16 +17,16 @@ import { normalizeErrors } from "@/utils/helpers";
 import { useRouter } from "next/navigation";
 
 const InitialData = {
-  role: "",
-  staff_name: "",
-  staff_email: "",
+  role: 2,
+  full_name: "",
+  email: "",
 };
 
 const CreateStaff = () => {
   const router = useRouter();
 
-  const { data, isLoading, isSuccess, error } = useGetFormsQuery("");
-  const forms = data?.data?.forms;
+  // const { data, isLoading, isSuccess, error } = useGetFormsQuery("");
+  // const forms = data?.data?.forms;
 
   const [
     createStaff,
@@ -37,26 +37,27 @@ const CreateStaff = () => {
     },
   ] = useCreateStaffMutation();
 
-  const [checkedCategories, setCheckedCategories] = useState([]);
+  // const [checkedCategories, setCheckedCategories] = useState([]);
   const { formData, setFormData, handleChange } = useForm(InitialData);
   // const [selectedIds, setSelectedIds] = useState([]);
 
   // Function to handle checkbox change
-  const handleCheckboxChange = (value) => {
-    // Update the checkedItems array based on the checkbox state
-    if (!checkedCategories.includes(value)) {
-      setCheckedCategories([...checkedCategories, value]);
-      // setSelectedIds([...selectedIds, value]);
-    } else {
-      setCheckedCategories(checkedCategories.filter((item) => item !== value));
-    }
-  };
+  // const handleCheckboxChange = (value) => {
+  //   // Update the checkedItems array based on the checkbox state
+  //   if (!checkedCategories.includes(value)) {
+  //     setCheckedCategories([...checkedCategories, value]);
+  //     // setSelectedIds([...selectedIds, value]);
+  //   } else {
+  //     setCheckedCategories(checkedCategories.filter((item) => item !== value));
+  //   }
+  // };
 
   const createNewStaff = async () => {
-    const { role, staff_name, staff_email } = formData;
-    const is_admin = role === "admin-staff";
+    const { role, full_name, email } = formData;
+    //const is_admin = role === 1;
+    // console.log(formData);
     const isInValid = validator.whiteSpaces(formData);
-    const emailIsValid = validator.validateEmail(staff_email);
+    const emailIsValid = validator.validateEmail(email);
     if (isInValid) {
       return toast.error("Fill in all fields correctly", { autoClose: 10000 });
     }
@@ -65,15 +66,15 @@ const CreateStaff = () => {
         autoClose: 10000,
       });
     }
-    if (checkedCategories.length === 0) {
-      return toast.error("Add atleast one role", { autoClose: 10000 });
-    }
+    // if (checkedCategories.length === 0) {
+    //   return toast.error("Add atleast one role", { autoClose: 10000 });
+    // }
     const payload = {
-      name: staff_name,
-      email: staff_email,
+      full_name,
+      email,
       password: "",
-      is_admin,
-      forms: checkedCategories,
+      role,
+      // forms: checkedCategories,
     };
     await createStaff(payload);
   };
@@ -87,7 +88,7 @@ const CreateStaff = () => {
       toast.success("Successfully created new staff", { autoClose: 5000 });
       router.push("/admin/staff-management");
     }
-  }, [createStaffError, createStaffSuccess]);
+  }, [createStaffError, createStaffSuccess, router]);
 
   return (
     <DashboardLayout header="Admin">
@@ -115,17 +116,17 @@ const CreateStaff = () => {
                 <option selected disabled>
                   Select the staff access
                 </option>
-                <option value="admin-staff">Admin Staff</option>
-                <option value="non-admin-staff">Non-admin Staff</option>
+                <option value={1}>Admin Staff</option>
+                <option value={2}>Non-admin Staff</option>
               </select>
             </div>
             <div className="space-y-2.5">
-              <p className="font-bold">Name</p>
+              <p className="font-bold">Full Name</p>
               <input
                 type="text"
-                name="staff_name"
+                name="full_name"
                 className="py-2 px-4 border-[1px] border-solid border-gray-300 rounded-lg"
-                value={formData.staff_name}
+                value={formData.full_name}
                 onChange={handleChange}
                 placeholder="Enter Name"
               />
@@ -134,15 +135,15 @@ const CreateStaff = () => {
               <p className="font-bold">Email Address</p>
               <input
                 type="email"
-                name="staff_email"
+                name="email"
                 className="py-2 px-4 border-[1px] border-solid border-gray-300 rounded-lg"
                 placeholder="Enter Email Address"
-                value={formData.staff_email}
+                value={formData.email}
                 onChange={handleChange}
               />
             </div>
           </div>
-          <div className="space-y-4 w-[60%]">
+          {/* <div className="space-y-4 w-[60%]">
             <h1 className="font-bold">Roles</h1>
             <div className="space-y-3">
               {isLoading ? (
@@ -165,7 +166,8 @@ const CreateStaff = () => {
                 ))
               )}
             </div>
-          </div>
+
+          </div> */}
           <div
             className="flex gap-x-4 w-full cursor-pointer"
             // onClick={() => {

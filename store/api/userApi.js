@@ -37,7 +37,7 @@ export const userApi = createApi({
     getUser: builder.query({
       query(userId) {
         return {
-          url: `/user/${userId}`,
+          url: `/admin/users/data/${userId}`,
         };
       },
       providesTags: (result, error, id) => [{ type: "Users", id }],
@@ -45,7 +45,7 @@ export const userApi = createApi({
     getAllUsers: builder.query({
       query({ page, limit }) {
         return {
-          url: `/users?page=${page}&&limit=${limit}`,
+          url: `/admin/users/data?page=${page}&&limit=${limit}`,
         };
       },
       invalidatesTags: [{ type: "Users", id: "LIST" }],
@@ -53,15 +53,16 @@ export const userApi = createApi({
     getAllStaffs: builder.query({
       query() {
         return {
-          url: `/staff`,
+          url: `/admin/staffs/data`,
         };
       },
       invalidatesTags: [{ type: "Users", id: "LIST" }],
     }),
-    createStaff: builder.mutation({
-      query(staffId) {
+
+    deleteUser: builder.mutation({
+      query(userId) {
         return {
-          url: `/staff/${staffId}`,
+          url: `/user/${userId}`,
           method: "POST",
         };
       },
@@ -70,7 +71,7 @@ export const userApi = createApi({
     getSingleStaff: builder.query({
       query(staffId) {
         return {
-          url: `/staff/${staffId}`,
+          url: `/admin/staffs/data/${staffId}`,
         };
       },
       invalidatesTags: [{ type: "Users", id: "LIST" }],
@@ -78,7 +79,7 @@ export const userApi = createApi({
     deleteStaff: builder.mutation({
       query(userId) {
         return {
-          url: `/users/${userId}`,
+          url: `/admin/staffs/data/${userId}`,
           method: "DELETE",
         };
       },
@@ -87,9 +88,9 @@ export const userApi = createApi({
     createStaff: builder.mutation({
       query(payload) {
         return {
-          url: "/staff",
+          url: `/auth/register/staff`,
           method: "POST",
-          body: payload
+          body: payload,
         };
       },
       invalidatesTags: [{ type: "Users", id: "LIST" }],
@@ -107,7 +108,7 @@ export const userApi = createApi({
     updateStaffStatus: builder.mutation({
       query({ staffId, payload }) {
         return {
-          url: `/staff/${staffId}`,
+          url: `/admin/staffs/data/${staffId}`,
           method: "PUT",
           body: payload,
         };

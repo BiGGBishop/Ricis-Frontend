@@ -15,45 +15,57 @@ import { setLoginTime, setToken } from "@/utils/authHelpers";
 import { registrationFormFields } from ".";
 import { decodeUrlQueryParams, normalizeErrors } from "@/utils/helpers";
 
-const InitialData = {
-  first_name: "",
-  company_name: "",
-  company_location: "",
-  last_name: "",
-  otp: "__",
-  company_role: "",
-  address: "",
-  phone: "",
-  email: "__",
-  password: "",
-};
-
 const CreateAccoutSuspenseBoundary = () => {
   const router = useRouter();
   const param = useSearchParams();
-  const { formData, setFormData, handleChange } = useForm(InitialData);
-  const [registerUser, { isLoading, isSuccess, isError, error, data }] =
-    useRegisterUserMutation();
-
-  console.log(data);
-
-  const disableBtn = validator.whiteSpaces(formData);
-
   const queryString = param.toString();
 
   const queryParams = decodeUrlQueryParams(queryString);
+
+  const InitialData = {
+    first_name: "",
+    last_name: "",
+    company_name: "",
+    company_location: "",
+    // otp: "__",
+    company_role: "",
+    address: "",
+    phone_number: "",
+    email: queryParams?.email,
+    password: "",
+  };
+  const { formData, setFormData, handleChange } = useForm(InitialData);
+  const [registerUser, { isLoading, isSuccess, error, data }] =
+    useRegisterUserMutation();
+
+  console.log("formData", formData);
+
+  const disableBtn = validator.whiteSpaces(formData);
+  console.log("disableBtn", disableBtn);
+
   const email = queryParams?.email;
-  const otp = queryParams?.otp;
+  // const otp = queryParams?.otp;
 
   const handleRegisterUser = async () => {
     const isInValid = validator.whiteSpaces(formData);
-    const payload = { ...formData, email, otp };
-    console.log(payload);
+    // const payload = { ...formData, email };
     if (isInValid) {
       toast.error(validator.errorMessage, { autoClose: 30000 });
       return;
     }
-    await registerUser(payload);
+    const dataX = await registerUser(formData);
+    console.log("dataX", dataX);
+    if (error) {
+      const err = normalizeErrors(error);
+      toast.error(err, { autoClose: 30000 });
+    }
+    if (isSuccess) {
+      toast.success(dataX?.data?.message, { autoClose: 1000 });
+      console.log("asss", dataX?.data?.token);
+      console.log("data?", dataX?.data);
+      router.replace("/user");
+      setLoginTime();
+    }
   };
 
   useEffect(() => {
@@ -63,18 +75,12 @@ const CreateAccoutSuspenseBoundary = () => {
     }
     if (isSuccess) {
       toast.success(data?.message, { autoClose: 1000 });
+      setToken(data?.data?.token);
+      console.log("data", data?.data);
       router.replace("/user");
-      setToken(data?.data?.token.token);
       setLoginTime();
     }
-  }, [
-    isSuccess,
-    isError,
-    data?.data?.token.token,
-    data?.message,
-    error,
-    router,
-  ]);
+  }, [isSuccess, data?.data?.token, data?.message, error, router, data?.data]);
 
   return (
     <FormLayout>

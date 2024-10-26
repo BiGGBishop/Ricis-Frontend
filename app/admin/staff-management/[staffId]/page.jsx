@@ -14,13 +14,12 @@ import {
   useGetStaffActivitiesQuery,
 } from "@/store/api/userApi";
 import { useParams } from "next/navigation";
- 
 
 const StaffProfile = () => {
   const params = useParams();
-  const staffId = params.staffId;
-  console.log(staffId);
+  const staffId = params?.staffId;
 
+  // console.log(staffId);
   const {
     data: staffActivityData,
     isLoading: staffActivityIsLoading,
@@ -31,14 +30,13 @@ const StaffProfile = () => {
 
   console.log(staffActivityData);
 
-  // console.log(data?.data);
-
   const { data, isLoading, isSuccess, isError } =
     useGetSingleStaffQuery(staffId);
+  // console.log("data", data);
 
-  const staff = data?.data?.staff[0];
+  const staff = data?.data;
   const processable_forms = staff?.processableForms;
-  const status = staff?.status;
+  const status = staff?.user_status;
 
   console.log(staff);
 
@@ -52,7 +50,7 @@ const StaffProfile = () => {
               <h1 className="font-bold">Status:</h1>
               <p
                 className={`relative px-2 py-1 rounded-lg bg-[#69CB5C] bg-opacity-15 text-[#69CB5C] ${
-                  status?.toLowerCase() === "active"
+                  status?.toLowerCase() === "approved"
                     ? "text-[#69CB5C]"
                     : status?.toLowerCase() === "suspended"
                     ? "text-[#EABD52] bg-yellow-300"

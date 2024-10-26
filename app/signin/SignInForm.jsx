@@ -2,7 +2,10 @@
 
 import { useRouter } from "next/navigation";
 import useForm from "@/hooks/useForm";
-import { useSignInUserMutation } from "@/store/api/authApi";
+import {
+  useSignInStaffMutation,
+  useSignInUserMutation,
+} from "@/store/api/authApi";
 import { getToken, setToken, setLoginTime } from "@/utils/authHelpers";
 import { validator } from "@/utils/validator";
 import { toast } from "react-toastify";
@@ -13,6 +16,8 @@ import Link from "next/link";
 import FormLayout from "@/components/FormLayout";
 import { ArrowLeft } from "@/svgs";
 import { normalizeErrors } from "@/utils/helpers";
+import { useDispatch } from "react-redux";
+import { setRole, setUser } from "@/store/features/userSlice";
 
 const InitialData = {
   email: "",
@@ -21,41 +26,116 @@ const InitialData = {
 
 const SignInForm = ({ heading, as_staff }) => {
   const { formData, setFormData, handleChange } = useForm(InitialData);
-  const [signInuser, { isLoading, isSuccess, isError, error, data }] =
+  const [signInUser, { isLoading, isSuccess, isError, error, data }] =
     useSignInUserMutation();
+  const [
+    signInStaff,
+    {
+      isLoading: isLoadingStaff,
+      isSuccess: isSuccessStaff,
+      isError: isErrorStaff,
+      error: errorStaff,
+      data: dataStaff,
+    },
+  ] = useSignInStaffMutation();
   const disableBtn = validator.whiteSpaces(formData);
   const router = useRouter();
   const token = getToken();
+  const dispatch = useDispatch();
 
   const handleSignIn = async () => {
-    const IsInValid = validator.whiteSpaces(formData);
-    const payload = { ...formData, as_staff };
-    if (IsInValid) {
-      toast.warning("Enter valid credentials!", { autoClose: 30000 });
-      return;
-    }
-    await signInuser(payload);
-  };
+    try {
+      const IsInValid = validator.whiteSpaces(formData);
+      //   const payload = { ...formData, as_staff };
+      //const payload = formData;
 
-  useEffect(() => {
-    console.log(token, "ttok");
-    if (error) {
+      if (IsInValid) {
+        toast.warning("Enter valid credentials!", { autoClose: 30000 });
+        return;
+      }
+      if (!as_staff) {
+        await signInUser(formData);
+        if (error) {
+          const err = normalizeErrors(error);
+          toast.error(err, { autoClose: 30000 });
+        }
+        if (isSuccess) {
+          toast.success(data?.message, { autoClose: 1000 });
+          router.replace("/user");
+          setToken(data?.data?.token);
+          dispatch(setUser(data?.data?.user));
+          dispatch(setRole("USER"));
+          setLoginTime();
+        }
+      } else {
+        await signInStaff(formData);
+        if (isSuccessStaff) {
+          toast.success(dataStaff?.message, { autoClose: 1000 });
+          router.replace("/admin");
+          setToken(dataStaff?.data?.token);
+          dispatch(setUser(dataStaff?.data?.user));
+          dispatch(
+            setRole(dataStaff?.data?.user?.userroleId === 1 ? "ADMIN" : "STAFF")
+          );
+          setLoginTime();
+        }
+        if (errorStaff) {
+          console.log("errorStaff", errorStaff);
+          const err = normalizeErrors(errorStaff);
+          toast.error(err, { autoClose: 30000 });
+        }
+      }
+    } catch (error) {
+      console.log("error", error);
       const err = normalizeErrors(error);
       toast.error(err, { autoClose: 30000 });
     }
-    if (isSuccess) {
-      toast.success(data?.message, { autoClose: 1000 });
-      router.replace(`${as_staff ? "/admin" : "/user"}`);
-      setToken(data?.data?.token.token);
-      setLoginTime();
+  };
+
+  useEffect(() => {
+    if (!as_staff) {
+      if (error) {
+        const err = normalizeErrors(error);
+        toast.error(err, { autoClose: 30000 });
+      }
+      if (isSuccess) {
+        toast.success(data?.message, { autoClose: 1000 });
+        dispatch(setUser(data?.data?.user));
+        dispatch(setRole("USER"));
+        setToken(data?.data?.token);
+        router.replace("/user");
+        setLoginTime();
+      }
+    } else {
+      if (isSuccessStaff) {
+        toast.success(dataStaff?.message, { autoClose: 1000 });
+        dispatch(setUser(dataStaff?.data?.user));
+        setToken(dataStaff?.data?.token);
+        dispatch(
+          setRole(dataStaff?.data?.user?.userroleId === 1 ? "ADMIN" : "STAFF")
+        );
+        router.replace("/admin");
+        setLoginTime();
+      }
+      if (errorStaff) {
+        const err = normalizeErrors(errorStaff);
+        toast.error(err, { autoClose: 30000 });
+      }
     }
   }, [
     isSuccess,
-    isError,
-    data?.data?.token.token,
+    data?.data?.token,
     data?.message,
     error,
     router,
+    as_staff,
+    isSuccessStaff,
+    errorStaff,
+    dataStaff?.message,
+    dataStaff?.data?.token,
+    data?.data?.user,
+    dispatch,
+    dataStaff?.data?.user,
   ]);
 
   return (
@@ -73,14 +153,14 @@ const SignInForm = ({ heading, as_staff }) => {
               label="Email"
               placeholder="Your Email"
               type="email"
-              value={formData.email}
+              value={formData?.email}
               handleChange={handleChange}
               name="email"
             />
             <TextInput
               label="Password"
               type="password"
-              value={formData.password}
+              value={formData?.password}
               handleChange={handleChange}
               placeholder="Enter Password"
               name="password"
@@ -97,7 +177,7 @@ const SignInForm = ({ heading, as_staff }) => {
             <Btn
               text="Login"
               handleClick={handleSignIn}
-              loading={isLoading}
+              loading={as_staff ? isLoadingStaff : isLoading}
               disabled={disableBtn}
               loadingMsg="Hold on..."
             />

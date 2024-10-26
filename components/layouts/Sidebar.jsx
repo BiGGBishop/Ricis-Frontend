@@ -14,6 +14,8 @@ import { useGetCurrentUserQuery } from "@/store/api/userApi";
 import { LogoutIcon, Offline, crossIcon } from "@/svgs";
 import Avatar from "../Avatar";
 import useNetworkStatus from "@/hooks/useNetworkStatus";
+import { useSelector } from "react-redux";
+import { selectRole, selectUser } from "@/store/features/userSlice";
 
 const activeClass = "bg-blue-700 hover:bg-blue-600";
 
@@ -30,10 +32,14 @@ const Sidebar = ({
   const isAdmin = pathname.includes("admin");
   const { isLoading, isSuccess, isError, error, data, refetch } =
     useGetCurrentUserQuery();
-  const role = data?.data.role;
+  const existRole = useSelector(selectRole);
+  const role = existRole ? existRole : data?.data.role;
   // alert(role)
-  const currentUser = data?.data.user;
-
+  const existUser = useSelector(selectUser);
+  const currentUser = existUser ? existUser : data?.data.user;
+  // console.log("currentUser", currentUser);
+  // console.log("role", role);
+  // console.log("currentUserRole", currentUserRole);
   const isOnline = useNetworkStatus();
 
   const openProfilePage = () => {
@@ -104,29 +110,30 @@ const Sidebar = ({
         </span>
         <div className="flex flex-col space-y-3 text-white mt-2">
           <ul className="lg:mt-28 space-y-3 text-sm">
-            {isSuccess &&
-              (currentUserRole === "user"
-                ? UserSidebarLinks
-                : currentUserRole === "staff"
-                ? StaffSidebarLinks
-                : currentUserRole === "admin"
-                ? AdminSidebarLinks
-                : []
-              ).map((link, index) => (
-                <>
-                  <li
-                    key={link.id}
-                    className={`${pathname === link.href ? activeClass : ""}
+            {/* {isSuccess && */}
+            {(currentUserRole === "user"
+              ? UserSidebarLinks
+              : currentUserRole === "staff"
+              ? StaffSidebarLinks
+              : currentUserRole === "admin"
+              ? AdminSidebarLinks
+              : []
+            ).map((link, index) => (
+              <>
+                <li
+                  key={link.id}
+                  className={`${pathname === link.href ? activeClass : ""}
                  flex items-center gap-2 p-2 rounded-md mb-3 text-xs`}
-                  >
-                    <span className="">{link.icon}</span>
-                    <Link className="" href={link.href}>
-                      {link.name}
-                    </Link>
-                  </li>
-                  {index === 0 ? <hr className="border-gray-600" /> : ""}
-                </>
-              ))}
+                >
+                  <span className="">{link.icon}</span>
+                  <Link className="" href={link.href}>
+                    {link.name}
+                  </Link>
+                </li>
+                {index === 0 ? <hr className="border-gray-600" /> : ""}
+              </>
+            ))}
+            {/*  } */}
             {isLoading &&
               [1, 2, 3, 4, 5].map((loader) => (
                 <div

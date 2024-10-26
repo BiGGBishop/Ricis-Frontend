@@ -82,7 +82,7 @@ const ApplicationsProvider = ({ children }) => {
 
   const { isLoading, isSuccess, error, data, refetch } =
     useGetAllApplicationsQuery(params);
-  const applications = data?.data.applications.data;
+  const applications = data?.data?.applications?.data;
   const dispatch = useDispatch();
   const token = getToken();
   console.log(data);

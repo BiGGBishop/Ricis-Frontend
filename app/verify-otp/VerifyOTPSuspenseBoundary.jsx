@@ -12,7 +12,7 @@ import { useRouter } from "next/navigation";
 import { useVerifyOTPMutation } from "@/store/api/authApi";
 import { otpNumbersFields } from ".";
 import { decodeUrlQueryParams, normalizeErrors } from "@/utils/helpers";
-import { getToken } from "@/utils/authHelpers";
+import { getToken, setToken } from "@/utils/authHelpers";
 import {
   InputOTPGroup,
   InputOTPSlot,
@@ -42,33 +42,49 @@ const VerifyOTPSuspenseBoundary = () => {
   const queryParams = decodeUrlQueryParams(queryString);
   const email_address = queryParams?.email;
 
-  const token = getToken();
+  //const token = getToken();
 
   const handleVerifyOTP = async () => {
-    const payload = { email: email_address, otp: otpValue };
-    if (!validator.validateOTPCode(otpValue)) {
-      toast.error("Enter valid otp codes!", { autoClose: 10000 });
-      return;
-    }
-    await verifyOTP(payload);
-  };
-
-  useEffect(() => {
-    if (error) {
+    try {
+      
+      const payload = { email: email_address, otp: otpValue };
+      if (!validator.validateOTPCode(otpValue)) {
+        toast.error("Enter valid otp codes!", { autoClose: 10000 });
+        return;
+      }
+      await verifyOTP(payload);
+      if (error) {
+        const err = normalizeErrors(error);
+        toast.error(err, { autoClose: 30000 });
+      }
+      if (isSuccess) {
+        toast.success(data?.message, { autoClose: 7000 });
+        console.log("dataV", data)
+        setToken(data?.data?.token);
+        router.push(`/create-account?email=${email_address}&otp=${otpValue}`);
+      }
+    } catch (error) {
       const err = normalizeErrors(error);
       toast.error(err, { autoClose: 30000 });
     }
-    if (isSuccess) {
-      toast.success(data?.message, { autoClose: 7000 });
-      router.push(`/create-account?email=${email_address}&otp=${otpValue}`);
-    }
-  }, [isSuccess, data?.message, error, otpValue, router]);
+  };
 
-  useEffect(() => {
-    if (token) {
-      router.replace("/user");
-    }
-  }, [token, router]);
+  // useEffect(() => {
+  //   if (error) {
+  //     const err = normalizeErrors(error);
+  //     toast.error(err, { autoClose: 30000 });
+  //   }
+  //   if (isSuccess) {
+  //     toast.success(data?.message, { autoClose: 7000 });
+  //     router.push(`/create-account?email=${email_address}&otp=${otpValue}`);
+  //   }
+  // }, [isSuccess, data?.message, error, otpValue, router]);
+
+  // useEffect(() => {
+  //   if (token) {
+  //     router.replace("/user");
+  //   }
+  // }, [token, router]);
 
   console.log(otpValue);
 

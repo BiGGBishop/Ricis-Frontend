@@ -17,11 +17,14 @@ const DashboardLayout = ({ children, header, icon, isSidebarLink }) => {
   const [showSidebar, setShowSidebar] = useState("hidden");
 
   const currentUser = useSelector(selectUser);
+
   const role = useSelector(selectRole);
   const isUser = role === "USER";
   const isOnline = useNetworkStatus();
 
-  console.log("gottend here ", role);
+  // console.log("currentUser 1 ", selectUser);
+  // console.log("currentUser here ", currentUser);
+  // console.log("gottend here ", role);
 
   const refreshPage = () => {
     window.location.reload(false);
