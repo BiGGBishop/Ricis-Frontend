@@ -1,18 +1,22 @@
-"use client";
+'use client';
 
-import Btn from "@/components/Btn";
-import DashboardLayout from "@/components/layouts/DashboardLayout";
-import WithAuth from "@/components/withAuth";
-import { useParams } from "next/navigation";
-import useForm from "@/hooks/useForm";
-import React, { useState } from "react";
-import { useRouter } from "next/navigation";
-import { categoryData } from "@/utils/categoryData";
+import Btn from '@/components/Btn';
+import DashboardLayout from '@/components/layouts/DashboardLayout';
+import WithAuth from '@/components/withAuth';
+import { useParams } from 'next/navigation';
+import useForm from '@/hooks/useForm';
+import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { categoryData } from '@/utils/categoryData';
+import {
+  useGetAllCategoriesQuery,
+  useAddClassificationMutation,
+} from '@/store/api/categoriesApi';
 
 const InitialData = {
-  role: "",
-  staff_name: "",
-  staff_email: "",
+  role: '',
+  staff_name: '',
+  staff_email: '',
 };
 
 const ManageClassification = () => {
@@ -129,7 +133,7 @@ const ManageClassification = () => {
             loading={false}
             loadingMsg="update category..."
             bgColorClass="bg-[#46B038]"
-            handleClick={() => console.log("update classification")}
+            handleClick={() => console.log('update classification')}
           />
           {/* <button className="text-sm bg-[#46B038] h-[50%] text-white py-2 px-4 w-fit rounded-md flex items-center justify-center">
               {btnLoad ? (

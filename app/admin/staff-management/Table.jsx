@@ -1,106 +1,107 @@
-"use client";
-import TableSkeleton from "@/components/skeleton-loaders/TableSkeleton";
-import { baseUrl } from "@/lib/configs";
+'use client';
+import TableSkeleton from '@/components/skeleton-loaders/TableSkeleton';
+import { baseUrl } from '@/lib/configs';
 import {
   useGetAllStaffsQuery,
   useUpdateStaffStatusMutation,
-} from "@/store/api/userApi";
-import { getToken } from "@/utils/authHelpers";
-import { formatDate, normalizeErrors } from "@/utils/helpers";
-import { time } from "@/utils/time&dates";
-import axios from "axios";
-import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+} from '@/store/api/userApi';
+import { getToken } from '@/utils/authHelpers';
+import { formatDate, normalizeErrors } from '@/utils/helpers';
+import { time } from '@/utils/time&dates';
+import axios from 'axios';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { toast } from 'react-toastify';
 
 const tableHeader = [
-  "Staff Name",
-  "Role",
-  "Email Address",
-  "Status",
-  "Date Applied",
-  "Action",
+  'Staff Name',
+  'Role',
+  'Email Address',
+  'Status',
+  'Date Applied',
+  'Action',
 ];
 
 const tableData = [
   {
-    staffname: "Sheila Daniels",
-    email: "Sheiladaniel@gmail.com",
-    status: "active",
+    staffname: 'Sheila Daniels',
+    email: 'Sheiladaniel@gmail.com',
+    status: 'active',
     dateApplied: {
-      date: "26/3/2024",
-      time: "16:34:04",
+      date: '26/3/2024',
+      time: '16:34:04',
     },
   },
   {
-    staffname: "Sheila Daniels",
-    email: "Sheiladaniel@gmail.com",
-    status: "active",
+    staffname: 'Sheila Daniels',
+    email: 'Sheiladaniel@gmail.com',
+    status: 'active',
     dateApplied: {
-      date: "26/3/2024",
-      time: "16:34:04",
+      date: '26/3/2024',
+      time: '16:34:04',
     },
   },
   {
-    staffname: "Sheila Daniels",
-    email: "Sheiladaniel@gmail.com",
-    status: "inactive",
+    staffname: 'Sheila Daniels',
+    email: 'Sheiladaniel@gmail.com',
+    status: 'inactive',
     dateApplied: {
-      date: "26/3/2024",
-      time: "16:34:04",
+      date: '26/3/2024',
+      time: '16:34:04',
     },
   },
   {
-    staffname: "Sheila Daniels",
-    email: "Sheiladaniel@gmail.com",
-    status: "active",
+    staffname: 'Sheila Daniels',
+    email: 'Sheiladaniel@gmail.com',
+    status: 'active',
     dateApplied: {
-      date: "26/3/2024",
-      time: "16:34:04",
+      date: '26/3/2024',
+      time: '16:34:04',
     },
   },
   {
-    staffname: "Sheila Daniels",
-    email: "Sheiladaniel@gmail.com",
-    status: "active",
+    staffname: 'Sheila Daniels',
+    email: 'Sheiladaniel@gmail.com',
+    status: 'active',
     dateApplied: {
-      date: "26/3/2024",
-      time: "16:34:04",
+      date: '26/3/2024',
+      time: '16:34:04',
     },
   },
   {
-    staffname: "Sheila Daniels",
-    email: "Sheiladaniel@gmail.com",
-    status: "inactive",
+    staffname: 'Sheila Daniels',
+    email: 'Sheiladaniel@gmail.com',
+    status: 'inactive',
     dateApplied: {
-      date: "26/3/2024",
-      time: "16:34:04",
+      date: '26/3/2024',
+      time: '16:34:04',
     },
   },
   {
-    staffname: "Sheila Daniels",
-    email: "Sheiladaniel@gmail.com",
-    status: "active",
+    staffname: 'Sheila Daniels',
+    email: 'Sheiladaniel@gmail.com',
+    status: 'active',
     dateApplied: {
-      date: "26/3/2024",
-      time: "16:34:04",
+      date: '26/3/2024',
+      time: '16:34:04',
     },
   },
   {
-    staffname: "Sheila Daniels",
-    email: "Sheiladaniel@gmail.com",
-    status: "active",
+    staffname: 'Sheila Daniels',
+    email: 'Sheiladaniel@gmail.com',
+    status: 'active',
     dateApplied: {
-      date: "26/3/2024",
-      time: "16:34:04",
+      date: '26/3/2024',
+      time: '16:34:04',
     },
   },
   {
-    staffname: "Sheila Daniels",
-    email: "Sheiladaniel@gmail.com",
-    status: "inactive",
+    staffname: 'Sheila Daniels',
+    email: 'Sheiladaniel@gmail.com',
+    status: 'inactive',
     dateApplied: {
-      date: "26/3/2024",
-      time: "16:34:04",
+      date: '26/3/2024',
+      time: '16:34:04',
     },
   },
 ];
@@ -108,10 +109,11 @@ const tableData = [
 const Table = () => {
   const [staffs, setStaffs] = useState();
   const param = useSearchParams();
-  const tab = param.get("tab");
+  const tab = param.get('tab');
 
-  const { isLoading, isSuccess, isError, error, data } = useGetAllStaffsQuery();
-  console.log("staffdata", data);
+  const { isLoading, isSuccess, isError, error, data, refetch } =
+    useGetAllStaffsQuery();
+  console.log('staffdata', data);
 
   const router = useRouter();
 
@@ -121,20 +123,20 @@ const Table = () => {
         setStaffs(data?.data);
         break;
 
-      case "all":
+      case 'all':
         setStaffs(data?.data);
         break;
 
-      case "active":
+      case 'active':
         const activeStaffs = data?.data?.filter(
-          (staff) => staff?.user_status === "approved"
+          (staff) => staff?.user_status === 'approved'
         );
         setStaffs(activeStaffs);
         break;
 
-      case "suspended":
+      case 'suspended':
         const suspendedStaffs = data?.data?.filter(
-          (staff) => staff.user_status === "suspend"
+          (staff) => staff.user_status === 'suspend'
         );
         setStaffs(suspendedStaffs);
         break;
@@ -143,7 +145,7 @@ const Table = () => {
         break;
     }
   }, [data, tab]);
-  console.log("staffs", staffs);
+  console.log('staffs', staffs);
   const handleStaff = (item) => {
     router.push(`/admin/staff-management/${item}?id=${item}`);
   };
@@ -157,12 +159,12 @@ const Table = () => {
     },
   ] = useUpdateStaffStatusMutation();
 
-  const [statusValue, setStatusValue] = useState("");
+  const [statusValue, setStatusValue] = useState('');
   const updateStatus = async (item) => {
-    if (item?.user_status === "approved") {
-      setStatusValue("suspended");
+    if (item?.user_status === 'approved') {
+      setStatusValue('suspended');
     } else {
-      setStatusValue("approved");
+      setStatusValue('approved');
     }
 
     try {
@@ -182,14 +184,14 @@ const Table = () => {
     if (updateStatusSuccess) {
       toast.success(
         `Successfully ${
-          status === "approved" ? "suspended" : "unsuspended"
+          status === 'approved' ? 'suspended' : 'unsuspended'
         } staff`,
         { autoClose: 5000 }
       );
       refetch();
     }
   }, [updateStatusError, updateStatusSuccess]);
-  if (isLoading||updatingStatus) return <TableSkeleton />;
+  if (isLoading || updatingStatus) return <TableSkeleton />;
 
   return (
     <div className="w-full overflow-x-scroll lg:overflow-x-hidden z-[-10] rounded-lg text-xs">
@@ -221,7 +223,7 @@ const Table = () => {
                   className={`px-6 py-4`}
                   onClick={() => handleStaff(data?.id)}
                 >
-                  {data?.userroleId === 1 ? "Admin" : "Staff"}
+                  {data?.userroleId === 1 ? 'Admin' : 'Staff'}
                 </td>
                 <td
                   className={`px-6 py-4`}
@@ -231,18 +233,18 @@ const Table = () => {
                 </td>
                 <td
                   className={`px-6 py-4 ${
-                    data?.user_status?.toLowerCase() === "approved"
-                      ? "text-[#69CB5C]"
-                      : data?.user_status?.toLowerCase() === "suspended"
-                      ? "text-[#EABD52]"
-                      : "text-black"
+                    data?.user_status?.toLowerCase() === 'approved'
+                      ? 'text-[#69CB5C]'
+                      : data?.user_status?.toLowerCase() === 'suspended'
+                      ? 'text-[#EABD52]'
+                      : 'text-black'
                   }  `}
                 >
                   <div
                     className={
-                      data?.user_status?.toLowerCase() === "approved"
-                        ? "bg-[#69CB5C1F] py-[4px] px-[8px] rounded-[12px] w-fit text-[12px] "
-                        : "bg-[#EABD521F] py-[4px] px-[8px] rounded-[12px] w-fit text-[12px] "
+                      data?.user_status?.toLowerCase() === 'approved'
+                        ? 'bg-[#69CB5C1F] py-[4px] px-[8px] rounded-[12px] w-fit text-[12px] '
+                        : 'bg-[#EABD521F] py-[4px] px-[8px] rounded-[12px] w-fit text-[12px] '
                     }
                   >
                     {data.user_status}
@@ -252,23 +254,23 @@ const Table = () => {
                   className={`px-6 py-4 `}
                   onClick={() => handleStaff(data?.id)}
                 >
-                  {time?.formatDate(data?.createdAt)} at{" "}
-                  {time?.formatTime(data?.createdAt)}{" "}
+                  {time?.formatDate(data?.createdAt)} at{' '}
+                  {time?.formatTime(data?.createdAt)}{' '}
                 </td>
                 <td className={`px-6 py-4 `}>
                   <span
                     onClick={() => updateStatus(data)}
                     className={`px-2.5 py-1.5 text-xs ${
-                      data?.user_status?.toLowerCase() === "approved"
-                        ? "bg-red-100 text-red-600"
-                        : data?.user_status?.toLowerCase() === "suspended"
-                        ? "bg-blue-100 text-blue-700"
-                        : "bg-green-100 text-green-700"
+                      data?.user_status?.toLowerCase() === 'approved'
+                        ? 'bg-red-100 text-red-600'
+                        : data?.user_status?.toLowerCase() === 'suspended'
+                        ? 'bg-blue-100 text-blue-700'
+                        : 'bg-green-100 text-green-700'
                     } font-medium rounded-3xl`}
                   >
-                    {data?.user_status?.toLowerCase() === "approved"
-                      ? "Suspend"
-                      : "Activate"}
+                    {data?.user_status?.toLowerCase() === 'approved'
+                      ? 'Suspend'
+                      : 'Activate'}
                   </span>
                 </td>
               </tr>

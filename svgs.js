@@ -7,6 +7,7 @@ export const headerRound = (color) => {
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
     >
+      
       <path
         d="M37.3016 18.4C33.3216 18.4 30.1016 15.16 30.1016 11.2C30.1016 9.58 30.6416 8.04 31.6416 6.76C31.6816 6.7 31.7416 6.66 31.7816 6.6C33.1416 4.94 35.1416 4 37.3016 4C41.2616 4 44.5016 7.24 44.5016 11.2C44.5016 13.42 43.5016 15.48 41.7416 16.86C40.4616 17.86 38.9216 18.4 37.3016 18.4ZM33.9016 8.74C33.3816 9.46 33.1016 10.3 33.1016 11.2C33.1016 13.52 34.9816 15.4 37.3016 15.4C38.2416 15.4 39.1416 15.08 39.8816 14.5C40.9016 13.7 41.5016 12.5 41.5016 11.2C41.5016 8.88 39.6216 7 37.3016 7C36.0016 7 34.8016 7.58 34.0216 8.6C33.9816 8.66 33.9416 8.7 33.9016 8.74Z"
         fill={color}
@@ -458,6 +459,14 @@ export const CiChartIcon = (
     />
   </svg>
 );
+
+
+
+export const categoryIcon = (
+  <svg   width="12"
+  height="14"
+  viewBox="0 0 24 14" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="5"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M17 10H19C21 10 22 9 22 7V5C22 3 21 2 19 2H17C15 2 14 3 14 5V7C14 9 15 10 17 10Z" stroke="#292D32" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M5 22H7C9 22 10 21 10 19V17C10 15 9 14 7 14H5C3 14 2 15 2 17V19C2 21 3 22 5 22Z" stroke="#292D32" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M6 10C8.20914 10 10 8.20914 10 6C10 3.79086 8.20914 2 6 2C3.79086 2 2 3.79086 2 6C2 8.20914 3.79086 10 6 10Z" stroke="#292D32" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M18 22C20.2091 22 22 20.2091 22 18C22 15.7909 20.2091 14 18 14C15.7909 14 14 15.7909 14 18C14 20.2091 15.7909 22 18 22Z" stroke="#292D32" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>
+)
 
 export const cerificateIcon = (
   <svg

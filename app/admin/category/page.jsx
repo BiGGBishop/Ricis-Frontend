@@ -1,46 +1,43 @@
-"use client";
-import WithAuth from "@/components/withAuth";
-import { baseUrl } from "@/lib/configs";
-import { getToken } from "@/utils/authHelpers";
-import axios from "axios";
-import { useEffect, useState } from "react";
-import { ClipLoader } from "react-spinners";
-import { toast } from "react-toastify";
-import DashboardLayout from "@/components/layouts/DashboardLayout";
-import { useGetFormsQuery } from "@/store/api/applicationApi";
-import useForm from "@/hooks/useForm";
-import { Checkbox } from "@/components/ui/checkbox";
-import Btn from "@/components/Btn";
-import { useCreateStaffMutation } from "@/store/api/userApi";
-import { validator } from "@/utils/validator";
-import { normalizeErrors } from "@/utils/helpers";
-import { useRouter } from "next/navigation";
-import { categoryData } from "@/utils/categoryData";
-import Table from "./Table";
-import Paginations from "@/components/Pagination";
+'use client';
+import WithAuth from '@/components/withAuth';
+import { baseUrl } from '@/lib/configs';
+import { getToken } from '@/utils/authHelpers';
+import axios from 'axios';
+import { useEffect, useState } from 'react';
+import { ClipLoader } from 'react-spinners';
+import { toast } from 'react-toastify';
+import DashboardLayout from '@/components/layouts/DashboardLayout';
+import { useGetFormsQuery } from '@/store/api/applicationApi';
+import useForm from '@/hooks/useForm';
+import { Checkbox } from '@/components/ui/checkbox';
+import Btn from '@/components/Btn';
+import { useCreateStaffMutation } from '@/store/api/userApi';
+import { validator } from '@/utils/validator';
+import { normalizeErrors } from '@/utils/helpers';
+import { useRouter } from 'next/navigation';
+import { categoryData } from '@/utils/categoryData';
+import Table from './Table';
+import { useCreateCategoriesMutation } from '@/store/api/categoriesApi';
+import Paginations from '@/components/Pagination';
 
 const InitialData = {
-  role: "",
-  status: "",
-  category: "",
-  id: "",
-  createdAt: "",
+  name: [],
 };
 
 const Category = () => {
   const router = useRouter();
 
-  const { data, isLoading, isSuccess, error } = useGetFormsQuery("");
+  const { data, isLoading, isSuccess, error } = useGetFormsQuery('');
   const forms = data?.data?.forms;
 
   const [
-    createStaff,
+    createCategories,
     {
-      isLoading: creatingStaff,
-      isSuccess: createStaffSuccess,
-      error: createStaffError,
+      isLoading: creatingCategories,
+      isSuccess: createCategoriesSuccess,
+      error: createCategoriesError,
     },
-  ] = useCreateStaffMutation();
+  ] = useCreateCategoriesMutation();
 
   const [checkedCategories, setCheckedCategories] = useState([]);
   const { formData, setFormData, handleChange } = useForm(InitialData);
@@ -57,42 +54,32 @@ const Category = () => {
     }
   };
 
-  const createNewStaff = async () => {
-    const { role, staff_name, staff_email } = formData;
-    const is_admin = role === "admin-staff";
+  const createNewCategories = async () => {
+    const { name } = formData;
+
     const isInValid = validator.whiteSpaces(formData);
-    const emailIsValid = validator.validateEmail(staff_email);
+
     if (isInValid) {
-      return toast.error("Fill in all fields correctly", { autoClose: 10000 });
+      return toast.error('Fill in all fields correctly', { autoClose: 10000 });
     }
-    if (!emailIsValid) {
-      return toast.error("Fill in a valid email address pls.", {
-        autoClose: 10000,
-      });
-    }
-    if (checkedCategories.length === 0) {
-      return toast.error("Add atleast one role", { autoClose: 10000 });
-    }
+
     const payload = {
-      name: staff_name,
-      email: staff_email,
-      password: "",
-      is_admin,
-      forms: checkedCategories,
+      name,
     };
-    await createStaff(payload);
+    await createCategories(payload);
   };
 
   useEffect(() => {
-    if (createStaffError) {
-      const err = normalizeErrors(createStaffError);
+    if (createCategoriesError) {
+      const err = normalizeErrors(createCategoriesError);
       toast.error(err, { autoClose: 30000 });
     }
-    if (createStaffSuccess) {
-      toast.success("Successfully created new staff", { autoClose: 5000 });
-      router.push("/admin/staff-management");
+    if (createCategoriesSuccess) {
+      toast.success('Successfully created new Category', { autoClose: 5000 });
+      // router.push('/admin/staff-management');
+      setFormData(InitialData);
     }
-  }, [createStaffError, createStaffSuccess]);
+  }, [createCategoriesSuccess, createCategoriesError]);
 
   return (
     <DashboardLayout header="Admin">
@@ -117,47 +104,23 @@ const Category = () => {
               create a category by filling the information below
             </p>
           </div>
-          <button
-            onClick={() => router.push("/admin/category")}
-            className="bg-blue-700 text-white shadow-md rounded-md flex gap-x-4 px-6 whitespace-nowrap items-center justify-center py-2 transform active:scale-75 transition-transform"
-          >
-            <img className="w-4 h-4" src="/images/transactionIcon.svg" alt="" />
-            <p className="font-medium text-sm">Add SubCategory</p>
-          </button>
         </div>
         <div className="bg-white w-full m-aut shadow-md rounded-md space-y-8 py-6 pl-6">
           <h1 className="text-[#46B038] font-bold">DETAILS</h1>
-          <div className="lg:flex gap-x-6 items-center w-full gap-y-6 lg:flex-wrap">
-            <div className="space-y-2.5 min-w-[350px]">
-              <p className="font-bold">Category</p>
-              <input
-                type="text"
-                name="staff_name"
-                className="py-2 px-4 border-[1px] border-solid border-gray-300 rounded-lg w-full"
-                value={formData.category}
-                onChange={handleChange}
-                placeholder="Enter Name"
-              />
-            </div>
-            <div className="max-w-s space-y-2.5 min-w-[200px]">
-              <label htmlFor="applicationType" className="block mb-2 font-bold">
-                Sub Category
-              </label>
-              <select
-                name="role"
-                value={formData.status}
-                onChange={handleChange}
-                id="countries"
-                className="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-              >
-                <option selected disabled>
-                  Select status
-                </option>
-                <option value="sub-cat-1">Enabled</option>
-                <option value="sub-cat-2">Disabled</option>
-              </select>
-            </div>
+          {/* <div className="lg:flex gap-x-6 items-center w-full gap-y-6 lg:flex-wrap"> */}
+          <div className="space-y-2.5 min-w-[350px]">
+            <p className="font-bold">Category</p>
+            <input
+              type="text"
+              name="name"
+              className="py-2 px-4 border-[1px] border-solid border-gray-300 rounded-lg w-full"
+              value={formData.name}
+              onChange={handleChange}
+              placeholder="Enter Name"
+            />
           </div>
+
+          {/* </div> */}
 
           <div
             className="flex gap-x-4 w-full cursor-pointer"
@@ -167,10 +130,10 @@ const Category = () => {
           >
             <Btn
               text="Create Category"
-              loading={creatingStaff}
+              loading={creatingCategories}
               loadingMsg="creating category..."
               bgColorClass="bg-[#46B038]"
-              handleClick={createNewStaff}
+              handleClick={createNewCategories}
             />
             {/* <button className="text-sm bg-[#46B038] h-[50%] text-white py-2 px-4 w-fit rounded-md flex items-center justify-center">
               {btnLoad ? (
