@@ -10,6 +10,7 @@ import {
   feesIcon,
   Analytics,
   cerificateIcon,
+  categoryIcon
 } from "@/svgs";
 
 export const UserSidebarLinks = [
@@ -87,7 +88,20 @@ export const AdminSidebarLinks = [
     name: "User Management",
     href: "/admin/user-management",
     icon: NotificationIcon,
-  }, {
+  },
+  {
+    id: "s9",
+    name: "Category",
+    href: "/admin/category",
+    icon: cerificateIcon,
+  },
+  {
+    id: "sss3",
+    name: "Sub Category",
+    href: "/admin/SubCategory",
+    icon: cerificateIcon,
+  },
+  {
     id: "s7",
     name: "Classification",
     href: "/admin/classification",

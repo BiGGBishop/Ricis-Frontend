@@ -1,12 +1,12 @@
-"use client";
+'use client';
 
-import DashboardLayout from "@/components/layouts/DashboardLayout";
-import Table from "./Table";
-import { useGetAllUsersQuery } from "@/store/api/userApi";
-import TableSkeleton from "@/components/skeleton-loaders/TableSkeleton";
-import Pagination from "./Pagination";
-import { useState } from "react";
-import WithAuth from "@/components/withAuth";
+import DashboardLayout from '@/components/layouts/DashboardLayout';
+import Table from './Table';
+import { useGetAllUsersQuery } from '@/store/api/userApi';
+import TableSkeleton from '@/components/skeleton-loaders/TableSkeleton';
+import Pagination from './Pagination';
+import { useState } from 'react';
+import WithAuth from '@/components/withAuth';
 
 const UserManagement = () => {
   const [page, setPage] = useState(1);
@@ -14,9 +14,9 @@ const UserManagement = () => {
     page: page,
     limit: 10,
   });
-  const users = data?.data.data;
-  const totalPages = data?.data?.meta.total;
- // console.log(users);
+  const users = data?.data?.data;
+  const totalPages = data?.data?.meta?.total;
+  // console.log(users);
   return (
     <DashboardLayout header="Admin" isSidebarLink={true}>
       <div className="w-full pb-8">
