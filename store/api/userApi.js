@@ -45,7 +45,7 @@ export const userApi = createApi({
     getAllUsers: builder.query({
       query({ page, limit }) {
         return {
-          url: `/admin/users/data?page=${page}&&limit=${limit}`,
+          url: `/users/multi`,
         };
       },
       invalidatesTags: [{ type: "Users", id: "LIST" }],
