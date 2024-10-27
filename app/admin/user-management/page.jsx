@@ -10,13 +10,15 @@ import WithAuth from '@/components/withAuth';
 
 const UserManagement = () => {
   const [page, setPage] = useState(1);
-  const { isLoading, isSuccess, isError, error, data } = useGetAllUsersQuery({
-    page: page,
-    limit: 10,
-  });
+  const { isLoading, isSuccess, isError, error, data } = useGetAllUsersQuery();
   const users = data?.data?.data;
+  console.log(data);
   const totalPages = data?.data?.meta?.total;
   // console.log(users);
+  // {
+  //   page: page,
+  //   limit: 10,
+  // }
   return (
     <DashboardLayout header="Admin" isSidebarLink={true}>
       <div className="w-full pb-8">
