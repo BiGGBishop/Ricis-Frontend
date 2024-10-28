@@ -29,7 +29,7 @@ export const userApi = createApi({
     getCurrentUser: builder.query({
       query() {
         return {
-          url: `/users/multi`,
+          url: `/users/details`,
         };
       },
       providesTags: (result, error, id) => [{ type: "Users", id }],

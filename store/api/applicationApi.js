@@ -100,7 +100,7 @@ export const applicationApi = createApi({
     getCategories: builder.query({
       query() {
         return {
-          url: "/categories",
+          url: "/startups/cat",
         };
       },
       invalidatesTags: [{ type: "Applications", id: "LIST" }],

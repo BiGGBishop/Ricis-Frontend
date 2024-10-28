@@ -1,6 +1,6 @@
 'use client';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { UserSidebarLinks, AdminSidebarLinks, StaffSidebarLinks } from '.';
 import {
@@ -13,8 +13,14 @@ import { useGetCurrentUserQuery } from '@/store/api/userApi';
 import { LogoutIcon, Offline, crossIcon } from '@/svgs';
 import Avatar from '../Avatar';
 import useNetworkStatus from '@/hooks/useNetworkStatus';
-import { useSelector } from 'react-redux';
-import { selectRole, selectUser } from '@/store/features/userSlice';
+import { useSelector, useDispatch } from 'react-redux';
+import {
+  selectRole,
+  selectUser,
+  setUser,
+  setRole,
+  clearUser,
+} from '@/store/features/userSlice';
 
 const activeClass = 'bg-blue-700 hover:bg-blue-600';
 
@@ -25,16 +31,13 @@ const Sidebar = ({
   showSidebar,
   setShowSidebar,
 }) => {
-  const [currentUserRole, setCurrentUserRole] = useState(() => {
-    if (typeof window !== 'undefined') {
-      const savedRole = localStorage.getItem('userRole');
-      return savedRole ? savedRole.toLowerCase() : null;
-    }
-    return null;
-  });
-
   const pathname = usePathname();
   const router = useRouter();
+  const dispatch = useDispatch();
+  const role = useSelector(selectRole);
+  const currentUser = useSelector(selectUser);
+  const isOnline = useNetworkStatus();
+
   const { isLoading, isSuccess, isError, error, data } = useGetCurrentUserQuery(
     undefined,
     {
@@ -43,11 +46,29 @@ const Sidebar = ({
     }
   );
 
-  const existRole = useSelector(selectRole);
-  const role = existRole || data?.data?.role;
-  const existUser = useSelector(selectUser);
-  const currentUser = existUser || data?.data?.user;
-  const isOnline = useNetworkStatus();
+  useEffect(() => {
+    if (data?.data) {
+      dispatch(setUser(data.data.user));
+      dispatch(setRole(data.data.role));
+    }
+  }, [data, dispatch]);
+
+  // I'm  Initialising from localStorage if Redux state is empty, because the user is not persistent with redux
+  useEffect(() => {
+    if (!currentUser && !role && typeof window !== 'undefined') {
+      const persistedUser = localStorage.getItem('persistedUser');
+      const persistedRole = localStorage.getItem('userRole');
+
+      if (persistedUser && persistedRole) {
+        try {
+          dispatch(setUser(JSON.parse(persistedUser)));
+          dispatch(setRole(persistedRole));
+        } catch (error) {
+          console.error('Error loading persisted state:', error);
+        }
+      }
+    }
+  }, [currentUser, role, dispatch]);
 
   const openProfilePage = () => {
     if (role === 'ADMIN' || role === 'STAFF') {
@@ -58,8 +79,7 @@ const Sidebar = ({
   };
 
   const logout = () => {
-    localStorage.removeItem('userRole');
-    setCurrentUserRole(null);
+    dispatch(clearUser());
     router.replace('/');
     removeToken();
     removeLoginTime();
@@ -83,27 +103,16 @@ const Sidebar = ({
   }, []);
 
   useEffect(() => {
-    if (role) {
-      const normalizedRole = role.toLowerCase();
-      if (normalizedRole !== currentUserRole) {
-        setCurrentUserRole(normalizedRole);
-        localStorage.setItem('userRole', role);
-      }
-    }
-  }, [role]);
-
-  useEffect(() => {
     if (!getToken()) {
       router.replace('/');
     }
   }, [router]);
 
   const renderLinks = () => {
-    const userRole = currentUserRole || (role && role.toLowerCase());
-    if (!userRole) return null;
+    if (!role) return null;
 
     let links;
-    switch (userRole) {
+    switch (role.toLowerCase()) {
       case 'user':
         links = UserSidebarLinks;
         break;
@@ -145,6 +154,10 @@ const Sidebar = ({
     );
   }
 
+  const showLoadingState = isLoading && !role && !currentUser;
+
+  const hasUserData = role && currentUser;
+
   return (
     <aside
       className={`h-screen bg-[#1A191B] px-2 fixed top-0 w-[12rem] z-[1000] overflow-y-auto lg:block ${showSidebar}`}
@@ -157,14 +170,14 @@ const Sidebar = ({
       </span>
       <div className="flex flex-col space-y-3 text-white mt-2">
         <ul className="lg:mt-28 space-y-3 text-sm">
-          {isLoading &&
+          {showLoadingState &&
             [1, 2, 3, 4, 5].map((loader) => (
               <div
                 key={loader}
                 className="w-full h-8 rounded-md bg-gray-700 animate-pulse"
               ></div>
             ))}
-          {renderLinks()}
+          {hasUserData && renderLinks()}
         </ul>
 
         <div className="text-sm py-8 lg:py-6">
@@ -183,7 +196,7 @@ const Sidebar = ({
           </button>
         </div>
 
-        {isSuccess && currentUser && (
+        {hasUserData && (
           <div
             onClick={openProfilePage}
             className="flex items-center gap-2 cursor-pointer pb-4"
@@ -202,7 +215,7 @@ const Sidebar = ({
           </div>
         )}
 
-        {(isLoading || !currentUser) && (
+        {showLoadingState && (
           <div className="fixed bottom-6 flex justify-center items-center gap-2 cursor-pointer">
             <div className="w-10 h-10 rounded-full animate-pulse bg-gray-700"></div>
             <div className="space-y-2">

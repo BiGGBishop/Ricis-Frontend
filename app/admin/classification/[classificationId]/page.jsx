@@ -5,38 +5,97 @@ import DashboardLayout from '@/components/layouts/DashboardLayout';
 import WithAuth from '@/components/withAuth';
 import { useParams } from 'next/navigation';
 import useForm from '@/hooks/useForm';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { categoryData } from '@/utils/categoryData';
+import { toast } from 'react-toastify';
 import {
   useGetAllCategoriesQuery,
-  useAddClassificationMutation,
+  useUpdateClassificationsMutation,
+  useGetSubCategoriesQuery,
 } from '@/store/api/categoriesApi';
 
 const InitialData = {
-  role: '',
-  staff_name: '',
-  staff_email: '',
+  category: '',
+  sub_category: '',
+  classification_name: '',
+  application_fee: '',
+  incidental_fee: '',
 };
 
 const ManageClassification = () => {
   const params = useParams();
   const classificationId = params.classificationId;
-
+  const { data: categoriesData, isLoading: isCategoriesLoading } =
+    useGetAllCategoriesQuery();
+  const [
+    updateClassifications,
+    {
+      isLoading: updatingClassification,
+      isSuccess: updateClassificationSuccess,
+      isError: updateClassificationError,
+    },
+  ] = useUpdateClassificationsMutation();
+  const categories = categoriesData?.data || [];
   const [checkedCategories, setCheckedCategories] = useState([]);
   const { formData, setFormData, handleChange } = useForm(InitialData);
-  // const [selectedIds, setSelectedIds] = useState([]);
 
-  // Function to handle checkbox change
   const handleCheckboxChange = (value) => {
-    // Update the checkedItems array based on the checkbox state
     if (!checkedCategories.includes(value)) {
       setCheckedCategories([...checkedCategories, value]);
-      // setSelectedIds([...selectedIds, value]);
     } else {
       setCheckedCategories(checkedCategories.filter((item) => item !== value));
     }
   };
+
+  const UpdateTheClassification = async () => {
+    const {
+      category,
+      sub_category,
+      classification_name,
+      application_fee,
+      incidental_fee,
+    } = formData;
+
+    const payload = {
+      category: parseInt(category),
+      sub_category: parseInt(sub_category),
+      classification_name: classification_name.trim(),
+      application_fee: parseFloat(application_fee),
+      incidental_fee: parseFloat(incidental_fee),
+    };
+
+    try {
+      await updateClassifications({
+        classificationId,
+        payload,
+      });
+    } catch (error) {
+      console.error(error);
+      toast.error('Failed to update classification', error?.message, {
+        autoClose: 5000,
+      });
+    }
+  };
+
+  useEffect(() => {
+    if (updateClassificationError) {
+      const err = normalizeErrors(updateClassificationError);
+      toast.error(err, { autoClose: 5000 });
+    }
+    if (updateClassificationSuccess) {
+      toast.success('Successfully updated classification', {
+        autoClose: 5000,
+      });
+      setFormData(InitialData);
+    }
+  }, [updateClassificationSuccess, updateClassificationError]);
+
+  const { data: subCategoriesData, isLoading: isSubCategoriesLoading } =
+    useGetSubCategoriesQuery(formData.category || '', {
+      skip: !formData.category,
+    });
+  const subCategories = subCategoriesData?.data || [];
 
   return (
     <DashboardLayout header={`Classification #${classificationId}`}>
@@ -51,9 +110,9 @@ const ManageClassification = () => {
             <p className="font-bold">Classification</p>
             <input
               type="text"
-              name="staff_name"
+              name="classification_name"
               className="py-2 px-4 border-[1px] border-solid border-gray-300 rounded-lg"
-              value={formData.staff_name}
+              value={formData.classification_name}
               onChange={handleChange}
               placeholder="Enter Name"
             />
@@ -63,18 +122,15 @@ const ManageClassification = () => {
               Category
             </label>
             <select
-              name="role"
-              value={formData.role}
+              name="category"
+              value={formData.category}
               onChange={handleChange}
-              id="countries"
               className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
             >
-              <option selected disabled>
-                Select category
-              </option>
-              {categoryData?.map((item) => (
-                <option key={item?.id} value={item?.value}>
-                  {item?.label}
+              <option value="">Select category</option>
+              {categories.map((category) => (
+                <option key={category.id} value={category.id}>
+                  {category.name}
                 </option>
               ))}
             </select>
@@ -84,66 +140,52 @@ const ManageClassification = () => {
               Sub Category
             </label>
             <select
-              name="role"
-              value={formData.role}
+              name="sub_category"
+              value={formData.sub_category}
               onChange={handleChange}
-              id="countries"
               className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
             >
-              <option selected disabled>
-                Select sub-category
-              </option>
-              <option value="sub-cat-1">Sub Category 1</option>
-              <option value="sub-cat-2">Sub Category 2</option>
+              <option value="">Select sub-category</option>
+              {subCategories.map((subCategory) => (
+                <option key={subCategory.id} value={subCategory.id}>
+                  {subCategory.name}
+                </option>
+              ))}
             </select>
           </div>
 
           <div className="space-y-2.5">
             <p className="font-bold">Application Fee</p>
             <input
-              type="text"
-              name="staff_email"
+              type="number"
+              name="application_fee"
               className="py-2 px-4 border-[1px] border-solid border-gray-300 rounded-lg"
               placeholder="Enter Amount"
-              value={formData.staff_email}
+              value={formData.application_fee}
               onChange={handleChange}
             />
           </div>
           <div className="space-y-2.5">
             <p className="font-bold">Incidental Fee</p>
             <input
-              type="text"
-              name="staff_email"
+              type="number"
+              name="incidental_fee"
               className="py-2 px-4 border-[1px] border-solid border-gray-300 rounded-lg"
               placeholder="Enter Amount"
-              value={formData.staff_email}
+              value={formData.incidental_fee}
               onChange={handleChange}
             />
           </div>
         </div>
 
-        <div
-          className="flex gap-x-4 w-full cursor-pointer"
-          // onClick={() => {
-          //   // createStaff();
-          // }}
-        >
+        <div className="flex gap-x-4 w-full cursor-pointer">
           <Btn
             text="Update Classification"
-            loading={false}
-            loadingMsg="update category..."
+            loading={updatingClassification}
+            loadingMsg="Updating classification..."
             bgColorClass="bg-[#46B038]"
-            handleClick={() => console.log('update classification')}
+            handleClick={UpdateTheClassification}
           />
-          {/* <button className="text-sm bg-[#46B038] h-[50%] text-white py-2 px-4 w-fit rounded-md flex items-center justify-center">
-              {btnLoad ? (
-                <ClipLoader color="#fff" size={20} />
-              ) : btnLoad ? (
-                "Creating..."
-              ) : (
-                "Create Account"
-              )}
-            </button> */}
         </div>
       </div>
     </DashboardLayout>

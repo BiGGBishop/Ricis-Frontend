@@ -46,6 +46,34 @@ export const categoriesApi = createApi({
       invalidatesTags: [{ type: "Categories", id: "LIST" }],
     }),
 
+    getAllClassifications: builder.query({
+      query: (params) => ({
+          url: `/admin/classification`,
+        // method: 'GET'
+        params
+        }),
+      
+      providesTags: [{ type: "Categories", id: "LIST" }],
+    }),
+
+    updateClassifications: builder.mutation({
+      query: ({ classificationId, payload }) => ({
+        url: `/admin/classification/${classificationId}`,
+        method: 'PATCH',
+        body: payload,
+      }),
+      providesTags: [{ type: "Categories" }],
+  }),
+  
+  
+  deleteClassifications: builder.mutation({
+    query: ({id, payload }) => ({
+      url: `/admin/classification/${id}`,
+      method: 'DELETE',
+     
+    }),
+    providesTags: [ "Categories" ],
+  }),
     getAllCategories: builder.query({
       query: (params) => ({
         url: `/startups/cat`,
@@ -60,7 +88,47 @@ export const categoriesApi = createApi({
           }),
         
         providesTags: [{ type: "Categories", id: "LIST" }],
+    }),
+    updateCategories: builder.mutation({
+      query: ({ categoryId, payload }) => ({
+        url: `/startups/cat/${categoryId}`,
+        method: 'PATCH',
+        body: payload,
       }),
+      providesTags: [{ type: "Categories" }],
+    }),
+    deleteCategories: builder.mutation({
+      query: ({ categoryId, payload }) => ({
+        url: `/startups/cat/${categoryId}`,
+        method: 'DELETE',
+        // body: payload,s
+      }),
+      providesTags: [ "Categories" ],
+    }),
+    getAllSubCategories: builder.query({
+      query: (category) => ({
+          url: `/startups/sub-cat/`,
+          // method: 'GET'
+        }),
+      
+      providesTags: [{ type: "Categories", id: "LIST" }],
+    }),
+    updateSubCategories: builder.mutation({
+      query: ({ subcategoryId, payload }) => ({
+        url: `/startups/sub-cat/${subcategoryId}`,
+        method: 'PATCH',
+        body: payload,
+      }),
+      providesTags: [{ type: "Categories" }],
+    }),
+    deleteSubCategories: builder.mutation({
+      query: ({subcategoryId, payload }) => ({
+        url: `/startups/sub-cat/${subcategoryId}`,
+        method: 'DELETE',
+        // /admin/classification/
+      }),
+      providesTags: [ "Categories" ],
+    }),
   }),
 });
 // /startups/sub-cat/
@@ -68,6 +136,14 @@ export const {
   useCreateCategoriesMutation,
   useAddClassificationMutation,
   useCreateSubCategoriesMutation,
-    useGetAllCategoriesQuery,
-  useGetSubCategoriesQuery
+  useGetAllCategoriesQuery,
+    useUpdateCategoriesMutation,
+  useGetSubCategoriesQuery,
+  useDeleteCategoriesMutation,
+  useGetAllSubCategoriesQuery,
+  useUpdateSubCategoriesMutation,
+  useGetAllClassificationsQuery,
+  useUpdateClassificationsMutation,
+  useDeleteSubCategoriesMutation,
+  useDeleteClassificationsMutation
 } = categoriesApi;

@@ -1,117 +1,200 @@
-"use client";
-import { Suspense, useState } from "react";
-import DashboardLayout from "@/components/layouts/DashboardLayout";
-import ApplicationForm from "./ApplicationForm";
-import WithAuth from "@/components/withAuth";
-import { Checkbox } from "@/components/ui/checkbox";
-import Btn from "@/components/Btn";
-import FPI from "../FPI";
-import { useRouter } from "next/navigation";
-import { useGetCategoriesQuery } from "@/store/api/applicationApi";
-import { ClipLoader } from "react-spinners";
-import { toast } from "react-toastify";
-
-const pagination = "<1/12 Pages >";
-
-const initialFormData = {
-  application_details: "",
-};
-
-const categories = [
-  {
-    id: "c1",
-    text: "Personnel Certification",
-  },
-  {
-    id: "c2",
-    text: "Millitary Certification",
-  },
-  {
-    id: "c3",
-    text: "ACSES Certification",
-  },
-  {
-    id: "c4",
-    text: "Personnel Certification",
-  },
-  {
-    id: "c5",
-    text: "Personnel Certification",
-  },
-];
+'use client';
+import { Suspense, useState } from 'react';
+import DashboardLayout from '@/components/layouts/DashboardLayout';
+import ApplicationForm from './ApplicationForm';
+import WithAuth from '@/components/withAuth';
+import { Checkbox } from '@/components/ui/checkbox';
+import Btn from '@/components/Btn';
+import FPI from '../FPI';
+import { useRouter } from 'next/navigation';
+import { useGetCategoriesQuery } from '@/store/api/applicationApi';
+import {
+  useGetAllClassificationsQuery,
+  useGetAllSubCategoriesQuery,
+} from '@/store/api/categoriesApi';
+import { ClipLoader } from 'react-spinners';
+import { toast } from 'react-toastify';
 
 const NewApplication = () => {
   const router = useRouter();
-  const { isLoading, isSuccess, error, data } = useGetCategoriesQuery();
-  const categories = data?.data?.categories;
-  const [checkedCategories, setCheckedCategories] = useState([]);
-  // const [selectedIds, setSelectedIds] = useState([]);
+  const { data: categoriesData, isLoading: isLoadingCategories } =
+    useGetCategoriesQuery();
+  const { data: subCategoriesData, isLoading: isLoadingSubCategories } =
+    useGetAllSubCategoriesQuery();
+  const { data: classificationsData, isLoading: isLoadingClassifications } =
+    useGetAllClassificationsQuery();
 
-  // Function to handle checkbox change
-  const handleCheckboxChange = (value) => {
-    // Update the checkedItems array based on the checkbox state
-    if (!checkedCategories.includes(value)) {
-      setCheckedCategories([...checkedCategories, value]);
-      // setSelectedIds([...selectedIds, value]);
-    } else {
-      setCheckedCategories(checkedCategories.filter((item) => item !== value));
+  const categories = categoriesData?.data;
+  const subCategories = subCategoriesData?.data;
+  const classifications = classificationsData?.data;
+
+  const [checkedCategories, setCheckedCategories] = useState([]);
+  const [checkedSubCategories, setCheckedSubCategories] = useState([]);
+  const [checkedClassifications, setCheckedClassifications] = useState([]);
+
+  const handleCheckboxChange = (value, type) => {
+    switch (type) {
+      case 'category':
+        if (!checkedCategories.includes(value)) {
+          setCheckedCategories([...checkedCategories, value]);
+        } else {
+          setCheckedCategories(
+            checkedCategories.filter((item) => item !== value)
+          );
+        }
+        break;
+      case 'subcategory':
+        if (!checkedSubCategories.includes(value)) {
+          setCheckedSubCategories([...checkedSubCategories, value]);
+        } else {
+          setCheckedSubCategories(
+            checkedSubCategories.filter((item) => item !== value)
+          );
+        }
+        break;
+      case 'classification':
+        if (!checkedClassifications.includes(value)) {
+          setCheckedClassifications([...checkedClassifications, value]);
+        } else {
+          setCheckedClassifications(
+            checkedClassifications.filter((item) => item !== value)
+          );
+        }
+        break;
     }
+  };
+
+  const validateSelections = () => {
+    const missingSelections = [];
+
+    if (checkedCategories.length === 0) {
+      missingSelections.push('Categories');
+    }
+    if (checkedSubCategories.length === 0) {
+      missingSelections.push('Sub Categories');
+    }
+    if (checkedClassifications.length === 0) {
+      missingSelections.push('Classifications');
+    }
+
+    return missingSelections;
   };
 
   const navigateToNextStep = () => {
-    if (checkedCategories?.length === 0) {
-      return toast.warning("Select one or more categories to proceed", {
-        autoClose: 30000,
-      });
+    const missingSelections = validateSelections();
+
+    if (missingSelections.length > 0) {
+      toast.error(
+        `Please select at least one item from: ${missingSelections.join(', ')}`,
+        {
+          autoClose: 5000,
+          // position: 'top-right',
+        }
+      );
+      return;
     }
-    const params = checkedCategories.join(",");
-    router.push(`/user/application-type?categories=${params}`);
-    // console.log(checkedCategories.join(","));
+
+    const params = {
+      categories: checkedCategories.join(','),
+      subcategories: checkedSubCategories.join(','),
+      classifications: checkedClassifications.join(','),
+    };
+    console.log(params);
+    const queryString = new URLSearchParams(params).toString();
+    router.push(`/user/application-type?${queryString}`);
   };
+
+  const CategorySection = ({ title, items, checkedItems, type, isLoading }) => (
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <h3 className="font-semibold text-gray-500">{title}</h3>
+        <span className="text-sm text-gray-500">
+          {checkedItems.length} selected
+        </span>
+      </div>
+      <div className="border rounded-lg overflow-hidden">
+        <div className="max-h-80 overflow-y-auto p-4">
+          {isLoading ? (
+            <div className="flex justify-center p-4">
+              <ClipLoader size={40} />
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+              {items?.map((item) => (
+                <div
+                  key={item.id}
+                  className="flex items-start gap-3 bg-gray-50 p-3 rounded-lg hover:bg-gray-100 transition-colors"
+                >
+                  <Checkbox
+                    value={item.id}
+                    checked={checkedItems.includes(item.id)}
+                    onCheckedChange={() => handleCheckboxChange(item.id, type)}
+                    className="mt-1"
+                  />
+                  <label className="text-sm font-medium leading-tight cursor-pointer">
+                    {item.name || item.classification_name}
+                  </label>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+
+  const isLoading =
+    isLoadingCategories || isLoadingSubCategories || isLoadingClassifications;
+  const hasAllSelections =
+    checkedCategories.length > 0 &&
+    checkedSubCategories.length > 0 &&
+    checkedClassifications.length > 0;
 
   return (
     <DashboardLayout header="New Application" icon="">
-      <div className="space-y-4 w-full">
-        <div className="">
+      <div className="flex flex-col min-h-screen space-y-4 w-full max-w-7xl mx-auto px-4">
+        <div>
           <h1 className="font-semibold text-lg">New Application</h1>
           <p className="text-sm">Select your preferred application category</p>
+          <p className="text-sm text-gray-500 mt-1">
+            * All sections require at least one selection
+          </p>
         </div>
-        <div className="flex justify-center mx-auto">
+
+        <div className="flex justify-center">
           <FPI length={4} shade={1} />
         </div>
-        <div className="w-full bg-white p-6 shadow-md rounded-md space-y-8 h-screen">
-          <h2 className="text-[#46B038] text-medium font-medium">
-            APPLICATION DETAILS
-          </h2>
-          <div className="space-y-4">
-            <h3 className="font-semibold text-gray-500">Categories</h3>
-            {
-              <div className="space-y-3">
-                {isLoading ? (
-                  <ClipLoader size={40} />
-                ) : (
-                  categories?.map((category) => (
-                    <div key={category.id} className="flex items-center gap-4">
-                      <Checkbox
-                        value={category.id}
-                        checked={checkedCategories.includes(category.id)}
-                        onCheckedChange={() =>
-                          handleCheckboxChange(category.id)
-                        }
-                      />
-                      <label
-                        htmlFor="terms"
-                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                      >
-                        {category.name}
-                      </label>
-                    </div>
-                  ))
-                )}
-              </div>
-            }
+
+        <div className="flex-1 bg-white p-6 shadow-md rounded-md space-y-6">
+          <h2 className="text-[#46B038] font-medium">APPLICATION DETAILS</h2>
+
+          <div className="space-y-6">
+            <CategorySection
+              title="Categories *"
+              items={categories}
+              checkedItems={checkedCategories}
+              type="category"
+              isLoading={isLoadingCategories}
+            />
+
+            <CategorySection
+              title="Sub Categories *"
+              items={subCategories}
+              checkedItems={checkedSubCategories}
+              type="subcategory"
+              isLoading={isLoadingSubCategories}
+            />
+
+            <CategorySection
+              title="Classifications *"
+              items={classifications}
+              checkedItems={checkedClassifications}
+              type="classification"
+              isLoading={isLoadingClassifications}
+            />
           </div>
-          <div className="flex items-center gap-3">
+
+          <div className="flex items-center gap-3 pt-4">
             <button
               onClick={() => router.back()}
               className="bg-black px-6 py-2.5 text-white text-sm font-medium rounded-md shadow-lg hover:opacity-70 transform active:scale-75 transition-transform"
@@ -122,7 +205,7 @@ const NewApplication = () => {
               handleClick={navigateToNextStep}
               bgColorClass="bg-[#46B038]"
               text="Next"
-              disabled={false}
+              disabled={isLoading}
             />
           </div>
         </div>
