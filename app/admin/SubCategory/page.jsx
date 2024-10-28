@@ -15,7 +15,7 @@ import { normalizeErrors } from '@/utils/helpers';
 import { useRouter } from 'next/navigation';
 import { useGetAllCategoriesQuery } from '@/store/api/categoriesApi';
 
-// import Table from './Table';
+import Table from './Table';
 import { useCreateSubCategoriesMutation } from '@/store/api/categoriesApi';
 import Paginations from '@/components/Pagination';
 
@@ -156,9 +156,8 @@ const SubCategory = () => {
         </div>
 
         <div className="bg-white rounded-lg space-y-6 p-4">
-          <h1 className="text-black font-bold">
-            Manage Sub-Category Information
-          </h1>
+          <h1 className="text-black font-bold">Manage Category Information</h1>
+          <Table />
         </div>
       </div>
     </DashboardLayout>

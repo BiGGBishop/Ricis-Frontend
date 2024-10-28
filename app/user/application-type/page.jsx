@@ -1,35 +1,44 @@
-"use client";
+'use client';
 
-import DashboardLayout from "@/components/layouts/DashboardLayout";
-import { useSearchParams } from "next/navigation";
-import useForm from "@/hooks/useForm";
-import { useGetFormsQuery } from "@/store/api/applicationApi";
-import { usePathname, useRouter } from "next/navigation";
-import { toast } from "react-toastify";
-import WithAuth from "@/components/withAuth";
-import FPI from "../FPI";
-import { Suspense } from "react";
-import { resetForm } from "@/utils/helpers";
+import DashboardLayout from '@/components/layouts/DashboardLayout';
+import { useSearchParams } from 'next/navigation';
+import useForm from '@/hooks/useForm';
+import { useGetFormsQuery } from '@/store/api/applicationApi';
+import { usePathname, useRouter } from 'next/navigation';
+import { toast } from 'react-toastify';
+import WithAuth from '@/components/withAuth';
+import FPI from '../FPI';
+import { Suspense } from 'react';
+import { resetForm } from '@/utils/helpers';
 
 const initialFormData = {
-  application_type: "",
+  application_type: '',
 };
 
 const ApplicationTypesSuspense = () => {
-  const param = useSearchParams();
-  const categories = param.get("categories");
-  const { isLoading, isSuccess, isError, error, data } =
-    useGetFormsQuery(categories);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const categories = searchParams.get('categories');
+  const subcategories = searchParams.get('subcategories');
+  const classifications = searchParams.get('classifications');
+  console.log(categories, subcategories, classifications);
+  const { isLoading, isSuccess, isError, error, data } = useGetFormsQuery({
+    categories,
+    subcategories,
+    classifications,
+  });
+
   const { formData, handleChange, setFormData } = useForm(initialFormData);
   const forms = data?.data.forms;
   const selectedFormId = forms?.find(
     (form) => form.name === formData.application_type
   )?.id;
-  const router = useRouter();
+  // const router = useRouter();
   console.log(forms);
 
   // let initialStoredFormData;
-  const storageForm = localStorage.getItem("formData");
+  const storageForm = localStorage.getItem('formData');
 
   // if (
   //   storageForm !== "undefined" &&
@@ -47,19 +56,19 @@ const ApplicationTypesSuspense = () => {
 
   const proceedToNextStep = () => {
     if (!formData.application_type) {
-      toast("Select a field to proceed!", { autoClose: 30000 });
+      toast('Select a field to proceed!', { autoClose: 30000 });
       return;
     }
     if (
-      storageForm !== "undefined" &&
-      storageForm !== "null" &&
+      storageForm !== 'undefined' &&
+      storageForm !== 'null' &&
       storageForm !== undefined &&
       storageForm !== null
     ) {
       const initialStoredFormData = JSON.parse(
-        localStorage.getItem("formData")
+        localStorage.getItem('formData')
       );
-      resetForm(initialStoredFormData, "formData");
+      resetForm(initialStoredFormData, 'formData');
       console.log("i'm here");
     }
     router.push(`/user/application-type/${selectedFormId}`);

@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useSelector } from 'react-redux';
+import { useState } from 'react';
 
 import TableSkeleton from '@/components/skeleton-loaders/TableSkeleton';
 import {
@@ -13,8 +14,15 @@ import { time } from '@/utils/time&dates';
 import { selectUser } from '@/store/features/userSlice';
 import { selectRole } from '@/store/features/userSlice';
 import { EmptyRecord } from '@/svgs';
-// import { categoryData } from "@/utils/categoryData";
-import { useGetAllCategoriesQuery } from '@/store/api/categoriesApi';
+import EditSubCategoryModal from './EditSubCategory';
+import ConfirmationModal from '../category/ConfirmDeleteModal';
+
+import {
+  useGetAllSubCategoriesQuery,
+  useUpdateSubCategoriesMutation,
+  useDeleteSubCategoriesMutation,
+} from '@/store/api/categoriesApi';
+import { toast } from 'react-toastify';
 
 const tableHeader = ['Ref No', 'Category', 'Date Created', 'Action'];
 
@@ -24,12 +32,80 @@ const TransactionsTable = () => {
   const role = useSelector(selectRole);
   //  console.log(role);
   const { isLoading, isSuccess, isError, error, data, refetch } =
-    useGetAllCategoriesQuery();
+    useGetAllSubCategoriesQuery();
   console.log(data);
   const categories = data?.data;
+
+  const [updateSubCategories, { isLoading: isUpdating }] =
+    useUpdateSubCategoriesMutation();
+  const [deleteSubCategories, { isLoading: isDeletingSubCategory }] =
+    useDeleteSubCategoriesMutation();
   // console.log(categoryData);
   const transactions = useSelector(selectTransactons);
   const fetchingStates = useSelector(selectFetchingStates);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const handleEditClick = (subcategory, e) => {
+    e.stopPropagation();
+    setSelectedCategory(subcategory);
+    setIsModalOpen(true);
+  };
+
+  const handleSaveSubCategory = async (updatedSubCategory) => {
+    try {
+      const result = await updateSubCategories({
+        subcategoryId: selectedCategory.id,
+        payload: { subcategory: updatedSubCategory.subcategory },
+      }).unwrap();
+
+      if (result) {
+        setIsModalOpen(false);
+        refetch();
+        toast.success('Sub Category updated successfully', { autoClose: 2000 });
+      }
+    } catch (error) {
+      console.error('Error updating sub category:', error);
+      toast.error('Error updating sub category', error?.message, {
+        autoClose: 2000,
+      });
+      throw error;
+    }
+  };
+
+  const handleDeleteClick = (category, e) => {
+    e.stopPropagation();
+    setSelectedCategory(category);
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!selectedCategory) return;
+
+    try {
+      setIsDeleting(true);
+
+      const result = await deleteSubCategories({
+        subcategoryId: selectedCategory.id,
+      }).unwrap();
+
+      if (result) {
+        refetch();
+        setIsDeleteModalOpen(false);
+        setSelectedCategory(null);
+        toast.success(' Sub Category deleted successfully', {
+          autoClose: 2000,
+        });
+      }
+    } catch (error) {
+      console.error('Error deleting sub category:', error);
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
   // const isLoading = fetchingStates?.isLoading;
   // const dispatch = useDispatch();
   //console.log(transactions);
@@ -85,13 +161,13 @@ const TransactionsTable = () => {
                     src="/images/edit1.svg"
                     alt=""
                     object
-                    onClick={() => console.log('')}
+                    onClick={(e) => handleEditClick(item, e)}
                   />
                   <img
                     className="w-5 h-5 text-red-500"
                     src="/images/delete.svg"
                     alt=""
-                    onClick={() => console.log('delete')}
+                    onClick={(e) => handleDeleteClick(item, e)}
                   />
                 </td>
               </tr>
@@ -99,6 +175,22 @@ const TransactionsTable = () => {
           })}
         </tbody>
       </table>
+      <EditSubCategoryModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        subcategory={selectedCategory}
+        onSave={handleSaveSubCategory}
+        isLoading={isUpdating}
+      />
+
+      <ConfirmationModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={handleConfirmDelete}
+        isLoading={isDeleting}
+        title="Delete Category"
+        message={`Are you sure you want to delete "${selectedCategory?.name}"? This action cannot be undone.`}
+      />
     </div>
   ) : (
     <div className="flex flex-col items-center pt-20 gap-4 bg-white rounded-[4px] h-screen">

@@ -1,28 +1,34 @@
-"use client";
+'use client';
 
-import { useRouter } from "next/navigation";
-import { useSelector } from "react-redux";
+import { useRouter } from 'next/navigation';
+import { useSelector } from 'react-redux';
 
-import TableSkeleton from "@/components/skeleton-loaders/TableSkeleton";
+import TableSkeleton from '@/components/skeleton-loaders/TableSkeleton';
 import {
   selectFetchingStates,
   selectTransactons,
-} from "@/store/features/transactionSlice";
-import { cutString } from "@/utils/helpers";
-import { time } from "@/utils/time&dates";
-import { selectUser } from "@/store/features/userSlice";
-import { selectRole } from "@/store/features/userSlice";
-import { EmptyRecord } from "@/svgs";
+} from '@/store/features/transactionSlice';
+import { cutString } from '@/utils/helpers';
+import { time } from '@/utils/time&dates';
+import { selectUser } from '@/store/features/userSlice';
+import { selectRole } from '@/store/features/userSlice';
+import { EmptyRecord } from '@/svgs';
+import {
+  useGetAllClassificationsQuery,
+  useDeleteClassificationsMutation,
+} from '@/store/api/categoriesApi';
+import { useState } from 'react';
+import ConfirmationModal from '../category/ConfirmDeleteModal';
 
 const tableHeader = [
-  "Ref No",
-  "Classification",
-  "Category",
-  "Sub Category",
-  "Application Fee",
-  "Incidental Fee",
-  "Date Created",
-  "Action",
+  'Ref No',
+  'Classification',
+  'Category',
+  'Sub Category',
+  'Application Fee',
+  'Incidental Fee',
+  'Date Created',
+  'Action',
 ];
 
 const TransactionsTable = () => {
@@ -34,11 +40,45 @@ const TransactionsTable = () => {
   const transactions = useSelector(selectTransactons);
   const fetchingStates = useSelector(selectFetchingStates);
   const isLoading = fetchingStates?.isLoading;
+  const {
+    data,
+    isLoading: isLoadingClassifications,
+    isError,
+    refetch,
+  } = useGetAllClassificationsQuery();
+  const classifications = data?.data;
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [selectedClassification, setSelectedClassification] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [deleteClassification] = useDeleteClassificationsMutation();
+
+  console.log(classifications);
   // const dispatch = useDispatch();
   //console.log(transactions);
 
+  const handleDeleteClick = (classification) => {
+    setSelectedClassification(classification);
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    setIsDeleting(true);
+    try {
+      await deleteClassification({
+        id: selectedClassification.id,
+        payload: {},
+      }).unwrap();
+      setIsDeleteModalOpen(false);
+      refetch();
+    } catch (error) {
+      console.error('Error deleting classification:', error);
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
   const openClassification = (classificationId) => {
-    if (role !== "USER") {
+    if (role !== 'USER') {
       router.push(`/admin/classification/${classificationId}`);
     }
   };
@@ -58,67 +98,70 @@ const TransactionsTable = () => {
           </tr>
         </thead>
         <tbody className="">
-          {transactions?.map((transaction, index) => {
+          {classifications?.map((classification, index) => {
             // const columns = Object.keys(data);
             return (
               <tr
-                key={transaction.id}
+                key={classification.id}
                 className="whitespace-nowrap lg:whitespace-normal bg-white border-b w-full cursor-pointer hover:opacity-70"
               >
                 <th
                   scope="row"
                   className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap"
                 >
-                  {cutString(transaction.reference, 10)}
+                  {cutString(classification.reference, 10)}
                 </th>
                 <td
                   className="px-6 py-4 w-80"
-                  onClick={() => openClassification(transaction?.id)}
+                  onClick={() => openClassification(classification?.id)}
                 >
-                  {transaction?.application?.form?.name}
+                  {classification?.classification_name}
                 </td>
                 <td
                   className="px-6 py-4 w-80"
-                  onClick={() => openClassification(transaction?.id)}
+                  onClick={() => openClassification(classification?.id)}
                 >
-                  {transaction?.application?.form?.name}
+                  {classification?.category?.name}
                 </td>
                 <td
                   className="px-6 py-4 w-80"
-                  onClick={() => openClassification(transaction?.id)}
+                  onClick={() => openClassification(classification?.id)}
                 >
-                  {transaction?.application?.form?.name}
+                  {classification?.subcategory?.name}
                 </td>
                 <td
                   className="px-6 py-4 w-20"
-                  onClick={() => openClassification(transaction?.id)}
+                  onClick={() => openClassification(classification?.id)}
                 >
-                  ₦ {transaction?.amount}
+                  ₦ {classification?.application_fee}
                 </td>
                 <td
                   className="px-6 py-4"
-                  onClick={() => openClassification(transaction?.id)}
+                  onClick={() => openClassification(classification?.id)}
                 >
-                  ₦ 5000
+                  ₦ {classification?.incidental_fee}
                 </td>
+
                 <td
                   className="px-6 py-4"
-                  onClick={() => openClassification(transaction?.id)}
+                  onClick={() => openClassification(classification?.id)}
                 >
-                  <p className="">{time.formatDate(transaction?.createdAt)}</p>
+                  <p className="">
+                    {time.formatDate(classification?.createdAt)}
+                  </p>
                 </td>
                 <td className="px-6 py-4 w-26 gap-5 items-center flex flex-row ">
                   <img
                     className="w-5 h-5 text-blue-500"
                     src="/images/edit1.svg"
                     alt=""
-                    onClick={() => openClassification(transaction?.id)}
+                    onClick={() => openClassification(classification?.id)}
                   />
                   <img
                     className="w-5 h-5 text-red-500"
                     src="/images/delete.svg"
                     alt=""
-                    onClick={() => console.log("delete")}
+                    onClick={() => handleDeleteClick(classification)}
                   />
                 </td>
               </tr>
@@ -126,6 +169,14 @@ const TransactionsTable = () => {
           })}
         </tbody>
       </table>
+      <ConfirmationModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={handleConfirmDelete}
+        isLoading={isDeleting}
+        title="Delete Classification"
+        message={`Are you sure you want to delete "${selectedClassification?.classification_name}"? This action cannot be undone.`}
+      />
     </div>
   ) : (
     <div className="flex flex-col items-center pt-20 gap-4 bg-white rounded-[4px] h-screen">
