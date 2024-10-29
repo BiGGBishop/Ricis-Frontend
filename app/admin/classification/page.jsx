@@ -1,16 +1,15 @@
-"use client";
+'use client';
 
-import InputField from "@/app/user/new-application/InputField";
-import DashboardLayout from "@/components/layouts/DashboardLayout";
-import { SearchIcon } from "@/svgs";
-import TransactionsTable from "@/components/TransactionsTable";
-import Table from "./Table";
-import WithAuth from "@/components/withAuth";
-import Search from "@/components/search/Search";
-import { useDispatch, useSelector } from "react-redux";
-import Paginations from "@/components/Pagination";
-import { setPage, selectTotalPage } from "@/store/features/transactionSlice";
-import { useRouter } from "next/navigation";
+import InputField from '@/app/user/new-application/InputField';
+import DashboardLayout from '@/components/layouts/DashboardLayout';
+import TransactionsTable from '@/components/TransactionsTable';
+import Table from './Table';
+import WithAuth from '@/components/withAuth';
+import Search from '@/components/search/Search';
+import { useDispatch, useSelector } from 'react-redux';
+import Paginations from '@/components/Pagination';
+import { setPage, selectTotalPage } from '@/store/features/transactionSlice';
+import { useRouter } from 'next/navigation';
 
 const Classification = () => {
   const router = useRouter();
@@ -30,7 +29,7 @@ const Classification = () => {
             </p>
           </div>
           <button
-            onClick={() => router.push("/admin/create-classification")}
+            onClick={() => router.push('/admin/create-classification')}
             className="bg-blue-700 text-white shadow-md rounded-md flex gap-x-4 px-6 whitespace-nowrap items-center justify-center py-2 transform active:scale-75 transition-transform"
           >
             <img className="w-4 h-4" src="/images/transactionIcon.svg" alt="" />
