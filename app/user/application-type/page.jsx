@@ -150,6 +150,7 @@ const ApplicationFormFields = () => {
     const classifications = JSON.parse(
       localStorage.getItem('checkedClassifications') || '[]'
     );
+    console.log(categories, subCategories, classifications);
     setSavedCategories({
       categories,
       subCategories,
