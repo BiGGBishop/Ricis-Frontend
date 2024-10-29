@@ -16,7 +16,10 @@ import { normalizeErrors } from '@/utils/helpers';
 import { useRouter } from 'next/navigation';
 
 import Table from './Table';
-import { useCreateCategoriesMutation } from '@/store/api/categoriesApi';
+import {
+  useCreateCategoriesMutation,
+  useUpdateCategoriesMutation,
+} from '@/store/api/categoriesApi';
 import Paginations from '@/components/Pagination';
 
 const InitialData = {
