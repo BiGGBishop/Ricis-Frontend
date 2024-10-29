@@ -1,31 +1,31 @@
-"use client";
+'use client';
 
-import { useRouter } from "next/navigation";
-import useForm from "@/hooks/useForm";
+import { useRouter } from 'next/navigation';
+import useForm from '@/hooks/useForm';
 import {
   useSignInStaffMutation,
   useSignInUserMutation,
-} from "@/store/api/authApi";
-import { getToken, setToken, setLoginTime } from "@/utils/authHelpers";
-import { validator } from "@/utils/validator";
-import { toast } from "react-toastify";
-import { useEffect } from "react";
-import TextInput from "@/components/TextInput";
-import Btn from "@/components/Btn";
-import Link from "next/link";
-import FormLayout from "@/components/FormLayout";
-import { ArrowLeft } from "@/svgs";
-import { normalizeErrors } from "@/utils/helpers";
-import { useDispatch } from "react-redux";
-import { setRole, setUser } from "@/store/features/userSlice";
+} from '@/store/api/authApi';
+import { getToken, setToken, setLoginTime } from '@/utils/authHelpers';
+import { validator } from '@/utils/validator';
+import { toast } from 'react-toastify';
+import { useEffect } from 'react';
+import TextInput from '@/components/TextInput';
+import Btn from '@/components/Btn';
+import Link from 'next/link';
+import FormLayout from '@/components/FormLayout';
+import { ArrowLeft } from '@/svgs';
+import { normalizeErrors } from '@/utils/helpers';
+import { useDispatch } from 'react-redux';
+import { setRole, setUser } from '@/store/features/userSlice';
 
 const InitialData = {
-  email: "",
-  password: "",
+  email: '',
+  password: '',
 };
 
 const SignInForm = ({ heading, as_staff }) => {
-  const { formData, setFormData, handleChange } = useForm(InitialData);
+  const { formData, handleChange } = useForm(InitialData);
   const [signInUser, { isLoading, isSuccess, isError, error, data }] =
     useSignInUserMutation();
   const [
@@ -40,53 +40,23 @@ const SignInForm = ({ heading, as_staff }) => {
   ] = useSignInStaffMutation();
   const disableBtn = validator.whiteSpaces(formData);
   const router = useRouter();
-  const token = getToken();
   const dispatch = useDispatch();
 
   const handleSignIn = async () => {
     try {
       const IsInValid = validator.whiteSpaces(formData);
-      //   const payload = { ...formData, as_staff };
-      //const payload = formData;
 
       if (IsInValid) {
-        toast.warning("Enter valid credentials!", { autoClose: 30000 });
+        toast.warning('Enter valid credentials!', { autoClose: 30000 });
         return;
       }
       if (!as_staff) {
         await signInUser(formData);
-        if (error) {
-          const err = normalizeErrors(error);
-          toast.error(err, { autoClose: 30000 });
-        }
-        if (isSuccess) {
-          toast.success(data?.message, { autoClose: 1000 });
-          router.replace("/user");
-          setToken(data?.data?.token);
-          dispatch(setUser(data?.data?.user));
-          dispatch(setRole("USER"));
-          setLoginTime();
-        }
       } else {
         await signInStaff(formData);
-        if (isSuccessStaff) {
-          toast.success(dataStaff?.message, { autoClose: 1000 });
-          router.replace("/admin");
-          setToken(dataStaff?.data?.token);
-          dispatch(setUser(dataStaff?.data?.user));
-          dispatch(
-            setRole(dataStaff?.data?.user?.userroleId === 1 ? "ADMIN" : "STAFF")
-          );
-          setLoginTime();
-        }
-        if (errorStaff) {
-          console.log("errorStaff", errorStaff);
-          const err = normalizeErrors(errorStaff);
-          toast.error(err, { autoClose: 30000 });
-        }
       }
     } catch (error) {
-      console.log("error", error);
+      console.log('error', error);
       const err = normalizeErrors(error);
       toast.error(err, { autoClose: 30000 });
     }
@@ -101,10 +71,10 @@ const SignInForm = ({ heading, as_staff }) => {
       if (isSuccess) {
         toast.success(data?.message, { autoClose: 1000 });
         dispatch(setUser(data?.data?.user));
-        dispatch(setRole("USER"));
+        dispatch(setRole('USER'));
         setToken(data?.data?.token);
-        router.replace("/user");
         setLoginTime();
+        router.push('/user');
       }
     } else {
       if (isSuccessStaff) {
@@ -112,10 +82,10 @@ const SignInForm = ({ heading, as_staff }) => {
         dispatch(setUser(dataStaff?.data?.user));
         setToken(dataStaff?.data?.token);
         dispatch(
-          setRole(dataStaff?.data?.user?.userroleId === 1 ? "ADMIN" : "STAFF")
+          setRole(dataStaff?.data?.user?.userroleId === 1 ? 'ADMIN' : 'STAFF')
         );
-        router.replace("/admin");
         setLoginTime();
+        router.push('/admin');
       }
       if (errorStaff) {
         const err = normalizeErrors(errorStaff);
@@ -124,18 +94,14 @@ const SignInForm = ({ heading, as_staff }) => {
     }
   }, [
     isSuccess,
-    data?.data?.token,
-    data?.message,
+    data,
     error,
     router,
     as_staff,
     isSuccessStaff,
     errorStaff,
-    dataStaff?.message,
-    dataStaff?.data?.token,
-    data?.data?.user,
+    dataStaff,
     dispatch,
-    dataStaff?.data?.user,
   ]);
 
   return (
