@@ -68,9 +68,14 @@ const NewApplication = () => {
     const missingSelections = validateSelections();
 
     if (missingSelections.length > 0) {
-      toast.error(`Please select a: ${missingSelections.join(', ')}`, {
-        autoClose: 5000,
-      });
+      toast.error(
+        `Please select at least one of the following: ${missingSelections.join(
+          ', '
+        )}`,
+        {
+          autoClose: 5000,
+        }
+      );
       return;
     }
     router.push('/user/application-type');
