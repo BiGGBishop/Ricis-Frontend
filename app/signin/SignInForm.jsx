@@ -75,33 +75,60 @@ const SignInForm = ({ heading, as_staff }) => {
 
       if (!as_staff) {
 
-        const result = await signInUser(formData).unwrap();
-        await handleAuthSuccess(
-          result.data.user,
-          result.data.token,
-          'USER',
-          '/user'
-        );
+        await signInUser(formData);
       } else {
-        const result = await signInStaff(formData).unwrap();
-        const role = result.data.user?.userroleId === 1 ? 'ADMIN' : 'STAFF';
-        await handleAuthSuccess(
-          result.data.user,
-          result.data.token,
-          role,
-          '/admin'
-        );
+        await signInStaff(formData);
       }
     } catch (error) {
-      console.error('SignIn error:', error);
+      console.log('error', error);
+
       const err = normalizeErrors(error);
       toast.error(err, { autoClose: 30000 });
     }
   };
 
+  useEffect(() => {
+    if (!as_staff) {
+      if (error) {
+        const err = normalizeErrors(error);
+        toast.error(err, { autoClose: 30000 });
+      }
+      if (isSuccess) {
+        toast.success(data?.message, { autoClose: 1000 });
+        dispatch(setUser(data?.data?.user));
+        dispatch(setRole('USER'));
+        setToken(data?.data?.token);
+        setLoginTime();
+        router.push('/user');
+      }
+    } else {
+      if (isSuccessStaff) {
+        toast.success(dataStaff?.message, { autoClose: 1000 });
+        dispatch(setUser(dataStaff?.data?.user));
+        setToken(dataStaff?.data?.token);
+        dispatch(
+          setRole(dataStaff?.data?.user?.userroleId === 1 ? 'ADMIN' : 'STAFF')
+        );
+        setLoginTime();
+        router.push('/admin');
+      }
+      if (errorStaff) {
+        const err = normalizeErrors(errorStaff);
+        toast.error(err, { autoClose: 30000 });
+      }
+    }
+  }, [
+    isSuccess,
+    data,
+    error,
+    router,
+    as_staff,
+    isSuccessStaff,
+    errorStaff,
+    dataStaff,
+    dispatch,
+  ]);
 
-  // Remove the useEffect that was handling success/error states
-  // since we're now handling everything in handleSignIn
 
   return (
     <FormLayout>
