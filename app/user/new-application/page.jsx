@@ -1,7 +1,6 @@
 'use client';
-import { Suspense, useState } from 'react';
+import { useState } from 'react';
 import DashboardLayout from '@/components/layouts/DashboardLayout';
-import ApplicationForm from './ApplicationForm';
 import WithAuth from '@/components/withAuth';
 import { Checkbox } from '@/components/ui/checkbox';
 import Btn from '@/components/Btn';
@@ -35,73 +34,61 @@ const NewApplication = () => {
   const handleCheckboxChange = (value, type) => {
     switch (type) {
       case 'category':
-        if (!checkedCategories.includes(value)) {
-          setCheckedCategories([...checkedCategories, value]);
-        } else {
-          setCheckedCategories(
-            checkedCategories.filter((item) => item !== value)
-          );
-        }
+        setCheckedCategories(
+          checkedCategories.includes(value)
+            ? checkedCategories.filter((item) => item !== value)
+            : [...checkedCategories, value]
+        );
         break;
       case 'subcategory':
-        if (!checkedSubCategories.includes(value)) {
-          setCheckedSubCategories([...checkedSubCategories, value]);
-        } else {
-          setCheckedSubCategories(
-            checkedSubCategories.filter((item) => item !== value)
-          );
-        }
+        setCheckedSubCategories(
+          checkedSubCategories.includes(value)
+            ? checkedSubCategories.filter((item) => item !== value)
+            : [...checkedSubCategories, value]
+        );
         break;
       case 'classification':
-        if (!checkedClassifications.includes(value)) {
-          setCheckedClassifications([...checkedClassifications, value]);
-        } else {
-          setCheckedClassifications(
-            checkedClassifications.filter((item) => item !== value)
-          );
-        }
+        setCheckedClassifications(
+          checkedClassifications.includes(value)
+            ? checkedClassifications.filter((item) => item !== value)
+            : [...checkedClassifications, value]
+        );
         break;
     }
   };
 
   const validateSelections = () => {
     const missingSelections = [];
-
-    if (checkedCategories.length === 0) {
-      missingSelections.push('Categories');
-    }
-    if (checkedSubCategories.length === 0) {
+    if (checkedCategories.length === 0) missingSelections.push('Categories');
+    if (checkedSubCategories.length === 0)
       missingSelections.push('Sub Categories');
-    }
-    if (checkedClassifications.length === 0) {
+    if (checkedClassifications.length === 0)
       missingSelections.push('Classifications');
-    }
-
     return missingSelections;
   };
 
+  localStorage.setItem('checkedCategories', JSON.stringify(checkedCategories));
+  localStorage.setItem(
+    'checkedSubCategories',
+    JSON.stringify(checkedSubCategories)
+  );
+  localStorage.setItem(
+    'checkedClassifications',
+    JSON.stringify(checkedClassifications)
+  );
+
   const navigateToNextStep = () => {
     const missingSelections = validateSelections();
-
     if (missingSelections.length > 0) {
       toast.error(
         `Please select at least one item from: ${missingSelections.join(', ')}`,
         {
           autoClose: 5000,
-          // position: 'top-right',
         }
       );
       return;
     }
-
-    const params = {
-      categories: checkedCategories.join(','),
-      subcategories: checkedSubCategories.join(','),
-      classifications: checkedClassifications.join(','),
-    };
-    console.log(params);
-    const queryString = new URLSearchParams(params).toString();
-    router.push(`/user/application-type?${queryString}`);
+    router.push('/user/application-type');
   };
 
   const CategorySection = ({ title, items, checkedItems, type, isLoading }) => (
@@ -145,10 +132,6 @@ const NewApplication = () => {
 
   const isLoading =
     isLoadingCategories || isLoadingSubCategories || isLoadingClassifications;
-  const hasAllSelections =
-    checkedCategories.length > 0 &&
-    checkedSubCategories.length > 0 &&
-    checkedClassifications.length > 0;
 
   return (
     <DashboardLayout header="New Application" icon="">

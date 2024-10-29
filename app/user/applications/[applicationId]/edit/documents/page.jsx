@@ -1,35 +1,35 @@
-"use client";
+'use client';
 
-import DashboardLayout from "@/components/layouts/DashboardLayout";
-import WithAuth from "@/components/withAuth";
-import FPI from "@/app/user/FPI";
-import Drop from "@/app/user/application-type/[applicationId]/documents/Drop";
-import Document from "@/app/user/application-type/[applicationId]/documents/Document";
-import { useParams, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import { Check, DocumentEmpty, file } from "@/svgs";
-import { toast } from "react-toastify";
-import { validator } from "@/utils/validator";
+import DashboardLayout from '@/components/layouts/DashboardLayout';
+import WithAuth from '@/components/withAuth';
+import FPI from '@/app/user/FPI';
+import Drop from '@/app/user/application-type/documents/Drop';
+import Document from '@/app/user/application-type/documents/Document';
+import { useParams, useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { Check, DocumentEmpty, file } from '@/svgs';
+import { toast } from 'react-toastify';
+import { validator } from '@/utils/validator';
 import {
   deleteAllDocuments,
   deleteSingleDocument,
   saveDocumentData,
   transferDocuments,
   updateSingleDocument,
-} from "@/lib/indexDB"; 
-import { getDocuments } from "@/lib/indexDB"; 
-import useFiles from "@/hooks/useFiles";
-import useDND from "@/hooks/useDND";
-import { truncateWithEllipsisAndExtension } from "@/utils/helpers";
+} from '@/lib/indexDB';
+import { getDocuments } from '@/lib/indexDB';
+import useFiles from '@/hooks/useFiles';
+import useDND from '@/hooks/useDND';
+import { truncateWithEllipsisAndExtension } from '@/utils/helpers';
 
 const Documents = () => {
   const router = useRouter();
   const params = useParams();
   const applicationId = params.applicationId;
-  const form_name = JSON.parse(localStorage.getItem("form_name"));
+  const form_name = JSON.parse(localStorage.getItem('form_name'));
 
   const generatedDocuments = JSON.parse(
-    localStorage.getItem("generatedEditDocuments")
+    localStorage.getItem('generatedEditDocuments')
   );
   const defaultDoc = generatedDocuments[0]?.form_field.name;
   const [documents, setDocuments] = useState([]);
@@ -40,7 +40,7 @@ const Documents = () => {
     handleFileUpload,
     sizeErrorFiles,
     setSizeErrorFiles,
-  } = useFiles("applicationDocuments", documents, selectedDoc, applicationId);
+  } = useFiles('applicationDocuments', documents, selectedDoc, applicationId);
 
   const {
     dragging,
@@ -58,13 +58,13 @@ const Documents = () => {
 
   //   Delete from selected document
   const removeAllDocument = () => {
-    deleteAllDocuments("applicationDocuments")
+    deleteAllDocuments('applicationDocuments')
       .then(() => {
-        console.log("All documents deleted successfully");
+        console.log('All documents deleted successfully');
         // Optionally, update the state or perform any other actions after deletion
       })
       .catch((error) => {
-        console.error("Failed to delete all documents:", error);
+        console.error('Failed to delete all documents:', error);
       });
   };
 
@@ -72,34 +72,34 @@ const Documents = () => {
 
   const removeSingleDocument = (itemId) => {
     selectedDocFiles.forEach((docFile) => window.URL.revokeObjectURL(docFile));
-    deleteSingleDocument("applicationDocuments", selectedDoc, itemId)
+    deleteSingleDocument('applicationDocuments', selectedDoc, itemId)
       .then(() => {
-        console.log("Item deleted successfully from document data");
+        console.log('Item deleted successfully from document data');
       })
       .catch((error) => {
-        console.error("Failed to delete item from document data:", error);
+        console.error('Failed to delete item from document data:', error);
       });
 
-    getDocuments("applicationDocuments")
+    getDocuments('applicationDocuments')
       .then((documents) => {
         setDocuments(documents);
         console.log(documents);
       })
       .catch((error) => {
-        console.error("Failed to load documents from IndexedDB:", error);
+        console.error('Failed to load documents from IndexedDB:', error);
       });
   };
 
   console.log(documents);
 
   useEffect(() => {
-    getDocuments("applicationDocuments")
+    getDocuments('applicationDocuments')
       .then((documents) => {
         setDocuments(documents);
         console.log(documents);
       })
       .catch((error) => {
-        console.error("Failed to load documents from IndexedDB:", error);
+        console.error('Failed to load documents from IndexedDB:', error);
       });
   }, [selectedDocFiles]);
 
@@ -150,11 +150,11 @@ const Documents = () => {
                         onClick={() => setSelectedDoc(doc.form_field.name)}
                         className={`flex items-center gap-3 cursor-pointer px-2 py-1.5 rounded-lg ${
                           selectedDoc === doc.form_field.name
-                            ? "bg-gray-300 font-semibold"
-                            : ""
+                            ? 'bg-gray-300 font-semibold'
+                            : ''
                         }`}
                       >
-                        <p>{doc.form_field.name.split("_").join(" ")}</p>
+                        <p>{doc.form_field.name.split('_').join(' ')}</p>
                         {/* {filledDoc && (
                         <span className="flex items-center justify-center rounded-full bg-[#69CB5C] w-4 h-4">
                           {Check}
@@ -190,16 +190,16 @@ const Documents = () => {
                     </div>
                   )}
                   <div className="w-full space-y-4">
-                    {(currentDocuments?.data?.length === 0 ||
-                      !currentDocuments) ||
-                      !uploadedDocument && (
+                    {currentDocuments?.data?.length === 0 ||
+                      !currentDocuments ||
+                      (!uploadedDocument && (
                         <div className="flex flex-col items-center space-y-3">
                           <span>{DocumentEmpty}</span>
                           <p className="text-sm text-gray-500">
                             No document selected.
                           </p>
                         </div>
-                      )}
+                      ))}
                     {currentDocuments?.data?.length > 0 ? (
                       currentDocuments?.data?.map((doc) => {
                         return (
