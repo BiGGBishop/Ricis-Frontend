@@ -1,26 +1,26 @@
-"use client";
+'use client';
 
-import Sidebar from "./Sidebar";
-import { useState } from "react";
-import { ArrowLeft, BellIcon } from "@/svgs";
-import Image from "next/image";
-import Hamburger from "../../public/images/hamburger.svg";
-import Avatar from "../Avatar";
-import { useSelector } from "react-redux";
-import { selectRole, selectUser } from "@/store/features/userSlice";
-import { useRouter } from "next/navigation";
-import useNetworkStatus from "@/hooks/useNetworkStatus";
-import { Offline } from "@/svgs";
+import Sidebar from './Sidebar';
+import { useState } from 'react';
+import { ArrowLeft, BellIcon } from '@/svgs';
+import Image from 'next/image';
+import Hamburger from '../../public/images/hamburger.svg';
+import Avatar from '../Avatar';
+import { useSelector } from 'react-redux';
+import { selectRole, selectUser } from '@/store/features/userSlice';
+import { useRouter } from 'next/navigation';
+import useNetworkStatus from '@/hooks/useNetworkStatus';
+import { Offline } from '@/svgs';
 
 const DashboardLayout = ({ children, header, icon, isSidebarLink }) => {
   const router = useRouter();
-  const [showSidebar, setShowSidebar] = useState("hidden");
+  const [showSidebar, setShowSidebar] = useState('hidden');
 
   const currentUser = useSelector(selectUser);
 
   const role = useSelector(selectRole);
-  const isUser = role === "USER";
-  const isOnline = useNetworkStatus();
+  const isUser = role === 'USER';
+  // const isOnline = useNetworkStatus();
 
   // console.log("currentUser 1 ", selectUser);
   // console.log("currentUser here ", currentUser);
@@ -33,7 +33,7 @@ const DashboardLayout = ({ children, header, icon, isSidebarLink }) => {
   return (
     <>
       <div className={`h-full w-full mt-28`}>
-        {showSidebar === "block" && (
+        {showSidebar === 'block' && (
           <div className="items-center gap-4 fixed inset-0 bg-[rgb(0,0,0,0.8)] bg-opacity-50 z-[999]"></div>
         )}
         <Sidebar
@@ -49,7 +49,7 @@ const DashboardLayout = ({ children, header, icon, isSidebarLink }) => {
               width="0"
               height="0"
               alt=""
-              onClick={() => setShowSidebar("block")}
+              onClick={() => setShowSidebar('block')}
               className="w-8 h-8 lg:hidden"
               src={Hamburger}
             />
@@ -63,7 +63,7 @@ const DashboardLayout = ({ children, header, icon, isSidebarLink }) => {
                     {ArrowLeft}
                   </span>
                 )}
-                {isOnline ? (
+                {/* {isOnline ? (
                   <h1 className="text-slate-800 text-lg font-semibold inline whitespace-nowrap">
                     {header}
                   </h1>
@@ -72,12 +72,12 @@ const DashboardLayout = ({ children, header, icon, isSidebarLink }) => {
                     <span className="">{Offline}</span>
                     <span className="">Offline</span>
                   </div>
-                )}
+                )} */}
               </div>
               <div className="flex items-center w-full justify-end gap-4">
                 {isUser && (
                   <div
-                    onClick={() => router.push("/user/notifications")}
+                    onClick={() => router.push('/user/notifications')}
                     className="p-2 border-2 rounded-full cursor-pointer"
                   >
                     <span className="">{BellIcon}</span>
@@ -90,7 +90,7 @@ const DashboardLayout = ({ children, header, icon, isSidebarLink }) => {
             </div>
           </div>
           <main className="lg:w-[calc(100%-8.5rem)] overflow-none lg:ml-[12rem]">
-            {isOnline ? (
+            {/* {isOnline ? (
               children
             ) : (
               <div className="w-full bg-white h-screen justify-center flex flex-col items-center gap-2 text-slate-800 text-lg font-semibold inline whitespace-nowrap">
@@ -105,7 +105,7 @@ const DashboardLayout = ({ children, header, icon, isSidebarLink }) => {
                   Refresh
                 </button>
               </div>
-            )}
+            )} */}
           </main>
         </div>
       </div>

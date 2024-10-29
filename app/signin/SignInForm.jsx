@@ -74,6 +74,7 @@ const SignInForm = ({ heading, as_staff }) => {
       }
 
       if (!as_staff) {
+
         const result = await signInUser(formData).unwrap();
         await handleAuthSuccess(
           result.data.user,
@@ -97,6 +98,7 @@ const SignInForm = ({ heading, as_staff }) => {
       toast.error(err, { autoClose: 30000 });
     }
   };
+
 
   // Remove the useEffect that was handling success/error states
   // since we're now handling everything in handleSignIn

@@ -1,39 +1,39 @@
-"use client";
+'use client';
 
-import { useParams, useRouter } from "next/navigation";
-import DashboardLayout from "@/components/layouts/DashboardLayout";
-import WithAuth from "@/components/withAuth";
-import { Check } from "@/svgs";
-import { document } from "@/svgs";
-import Document from "@/app/user/application-type/[applicationId]/preview/Document";
-import Btn from "@/components/Btn";
-import { cloud_name, upload_preset } from "@/lib/configs";
-import { useAddNewApplicationMutation } from "@/store/api/applicationApi";
-import { useState, useEffect } from "react";
-import { toast } from "react-toastify";
-import { normalizeErrors } from "@/utils/helpers";
-import PaymentModal from "@/components/modals/paymentModal";
-import { deleteDocumentsByDraftId, getDocuments } from "@/lib/indexDB";
-import { ImageUpload } from "@/components/imageUpload";
-import ImageUploadLoader from "@/components/loaders/imageUpload";
-import { deleteAllDocuments } from "@/lib/indexDB";
-import { convertToValidNumberType } from "@/utils/helpers";
+import { useParams, useRouter } from 'next/navigation';
+import DashboardLayout from '@/components/layouts/DashboardLayout';
+import WithAuth from '@/components/withAuth';
+import { Check } from '@/svgs';
+import { document } from '@/svgs';
+import Document from '@/app/user/application-type/preview/Document';
+import Btn from '@/components/Btn';
+import { cloud_name, upload_preset } from '@/lib/configs';
+import { useAddNewApplicationMutation } from '@/store/api/applicationApi';
+import { useState, useEffect } from 'react';
+import { toast } from 'react-toastify';
+import { normalizeErrors } from '@/utils/helpers';
+import PaymentModal from '@/components/modals/paymentModal';
+import { deleteDocumentsByDraftId, getDocuments } from '@/lib/indexDB';
+import { ImageUpload } from '@/components/imageUpload';
+import ImageUploadLoader from '@/components/loaders/imageUpload';
+import { deleteAllDocuments } from '@/lib/indexDB';
+import { convertToValidNumberType } from '@/utils/helpers';
 
 const Preview = () => {
   const router = useRouter();
   const params = useParams();
   const param = params.draftId;
-  const draftId = param.split("-")[0];
-  const applicationId = param.split("-")[1];
+  const draftId = param.split('-')[0];
+  const applicationId = param.split('-')[1];
   const [isUploading, setIsUploading] = useState(false);
   const [documents, setDocuments] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [paynow, setPaynow] = useState(false);
 
-  const form_name = JSON.parse(localStorage.getItem("form_name"));
+  const form_name = JSON.parse(localStorage.getItem('form_name'));
 
   useEffect(() => {
-    getDocuments("draftDocuments")
+    getDocuments('draftDocuments')
       .then((documents) => {
         const singleDraftDocuments = documents?.filter(
           (doc) => doc.docId === draftId
@@ -41,12 +41,12 @@ const Preview = () => {
         setDocuments(singleDraftDocuments);
       })
       .catch((error) => {
-        console.error("Failed to load documents from IndexedDB:", error);
+        console.error('Failed to load documents from IndexedDB:', error);
       });
   }, []);
 
   // retrieve already stored data from localstorage
-  const storedFormData = JSON.parse(localStorage.getItem("draftFormData"));
+  const storedFormData = JSON.parse(localStorage.getItem('draftFormData'));
   const formData = Object.keys(storedFormData);
 
   // const storedDocuments = JSON.parse(localStorage.getItem("documents"));
@@ -88,8 +88,8 @@ const Preview = () => {
       for (let i = 0; i < allFiles.length; i++) {
         let file = allFiles[i];
         let formData = new FormData();
-        formData.append("file", file);
-        formData.append("upload_preset", upload_preset);
+        formData.append('file', file);
+        formData.append('upload_preset', upload_preset);
         formDatas.push(formData);
       }
 
@@ -99,7 +99,7 @@ const Preview = () => {
           setIsUploading(true);
           try {
             const response = await fetch(url, {
-              method: "POST",
+              method: 'POST',
               body: formData,
             });
             const data = await response.json();
@@ -109,10 +109,10 @@ const Preview = () => {
               value: data.secure_url,
             });
           } catch (err) {
-            console.error("Error uploading file:", err);
+            console.error('Error uploading file:', err);
             setIsLoading(false);
           } finally {
-            console.log("done");
+            console.log('done');
             setIsUploading(false);
           }
         })
@@ -124,7 +124,7 @@ const Preview = () => {
 
   const createNewApplication = async () => {
     const formFieldTypesObj = JSON.parse(
-      localStorage.getItem("draftErrorFields")
+      localStorage.getItem('draftErrorFields')
     );
     const formData = convertToValidNumberType(
       storedFormData,
@@ -171,17 +171,17 @@ const Preview = () => {
       setIsLoading(false);
     }
     if (isApplicationSuccess) {
-      toast.success("Successfully created form!", { autoClose: 5000 });
+      toast.success('Successfully created form!', { autoClose: 5000 });
       setIsLoading(false);
       setPaynow(true);
       // Delete all documents from indexDB after upload
       deleteDocumentsByDraftId(draftId)
         .then(() => {
-          console.log("All documents deleted successfully");
+          console.log('All documents deleted successfully');
           // Optionally, update the state or perform any other actions after deletion
         })
         .catch((error) => {
-          console.error("Failed to delete all documents:", error);
+          console.error('Failed to delete all documents:', error);
         });
     }
   }, [isApplicationSuccess, applicationError]);
@@ -209,7 +209,7 @@ const Preview = () => {
             <div className="flex justify-between items-center w-full">
               <div className="">
                 <h1 className="text-black font-bold">
-                  Application Name:{" "}
+                  Application Name:{' '}
                   <span className="text-[#46B038]"> {form_name}</span>
                 </h1>
                 <p className="text-gray-600 text-sm">
@@ -228,7 +228,7 @@ const Preview = () => {
                   <div key={name} className="space-y-3">
                     <div className="flex items-center gap-2">
                       <span className="font-semibold">
-                        {name.split("_").join(" ")}
+                        {name.split('_').join(' ')}
                       </span>
                       <span className="flex items-center justify-center rounded-full bg-[#69CB5C] w-4 h-4">
                         {Check}

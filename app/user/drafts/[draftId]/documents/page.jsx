@@ -1,37 +1,37 @@
-"use client";
+'use client';
 
-import DashboardLayout from "@/components/layouts/DashboardLayout";
-import WithAuth from "@/components/withAuth";
+import DashboardLayout from '@/components/layouts/DashboardLayout';
+import WithAuth from '@/components/withAuth';
 // import FPI from "@/app/user/FPI";
-import Drop from "@/app/user/application-type/[applicationId]/documents/Drop";
+import Drop from '@/app/user/application-type/documents/Drop';
 // import Document from "@/app/user/application-type/[applicationId]/preview/Document";
-import Document from "@/app/user/application-type/[applicationId]/documents/Document";
-import { useParams, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import { Check, DocumentEmpty, file } from "@/svgs";
-import { toast } from "react-toastify";
-import { validator } from "@/utils/validator";
+import Document from '@/app/user/application-type/documents/Document';
+import { useParams, useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { Check, DocumentEmpty, file } from '@/svgs';
+import { toast } from 'react-toastify';
+import { validator } from '@/utils/validator';
 import {
   deleteAllDocuments,
   deleteSingleDocument,
   saveDocumentData,
   updateSingleDocument,
-} from "@/lib/indexDB";
-import { getDocuments } from "@/lib/indexDB";
-import useFiles from "@/hooks/useFiles";
-import useDND from "@/hooks/useDND";
+} from '@/lib/indexDB';
+import { getDocuments } from '@/lib/indexDB';
+import useFiles from '@/hooks/useFiles';
+import useDND from '@/hooks/useDND';
 
 const Documents = () => {
   const router = useRouter();
   const params = useParams();
   const param = params.draftId;
-  const draftId = param.split("-")[0];
-  const applicationId = param.split("-")[1];
+  const draftId = param.split('-')[0];
+  const applicationId = param.split('-')[1];
 
-  const form_name = JSON.parse(localStorage.getItem("form_name"));
+  const form_name = JSON.parse(localStorage.getItem('form_name'));
 
   const generatedDraftDocuments = JSON.parse(
-    localStorage.getItem("generatedDraftDocuments")
+    localStorage.getItem('generatedDraftDocuments')
   );
   const defaultDoc = generatedDraftDocuments[0]?.form_field.name;
 
@@ -45,7 +45,7 @@ const Documents = () => {
     sizeErrorFiles,
     setSizeErrorFiles,
   } = useFiles(
-    "draftDocuments",
+    'draftDocuments',
     documents,
     selectedDoc,
     applicationId,
@@ -68,28 +68,28 @@ const Documents = () => {
 
   //   Delete from selected document
   const removeAllDocument = () => {
-    deleteAllDocuments("draftDocuments")
+    deleteAllDocuments('draftDocuments')
       .then(() => {
-        console.log("All documents deleted successfully");
+        console.log('All documents deleted successfully');
         // Optionally, update the state or perform any other actions after deletion
       })
       .catch((error) => {
-        console.error("Failed to delete all documents:", error);
+        console.error('Failed to delete all documents:', error);
       });
   };
 
   // console
 
   const removeSingleDocument = (itemId) => {
-    deleteSingleDocument("draftDocuments", selectedDoc, itemId)
+    deleteSingleDocument('draftDocuments', selectedDoc, itemId)
       .then(() => {
-        console.log("Item deleted successfully from document data");
+        console.log('Item deleted successfully from document data');
       })
       .catch((error) => {
-        console.error("Failed to delete item from document data:", error);
+        console.error('Failed to delete item from document data:', error);
       });
 
-    getDocuments("draftDocuments")
+    getDocuments('draftDocuments')
       .then((documents) => {
         const singleDraftDocuments = documents?.filter(
           (doc) => doc.docId === draftId && doc.applicationId === applicationId
@@ -98,14 +98,14 @@ const Documents = () => {
         console.log(singleDraftDocuments);
       })
       .catch((error) => {
-        console.error("Failed to load documents from IndexedDB:", error);
+        console.error('Failed to load documents from IndexedDB:', error);
       });
   };
 
   console.log(documents);
 
   useEffect(() => {
-    getDocuments("draftDocuments")
+    getDocuments('draftDocuments')
       .then((documents) => {
         const singleDraftDocuments = documents?.filter(
           (doc) => doc.docId === draftId && doc.applicationId === applicationId
@@ -114,7 +114,7 @@ const Documents = () => {
         console.log();
       })
       .catch((error) => {
-        console.error("Failed to load documents from IndexedDB:", error);
+        console.error('Failed to load documents from IndexedDB:', error);
       });
   }, [selectedDocFiles]);
 
@@ -123,7 +123,7 @@ const Documents = () => {
     router.push(`/user/drafts/${id}/preview`);
   };
 
-  const addedDocs = JSON.parse(localStorage.getItem("documents"));
+  const addedDocs = JSON.parse(localStorage.getItem('documents'));
 
   const documentsEmpty =
     documents?.length === 0
@@ -139,7 +139,7 @@ const Documents = () => {
           <div className="flex justify-between items-center w-full">
             <div className="">
               <h1 className="text-black font-bold">
-                Application Name:{" "}
+                Application Name:{' '}
                 <span className="text-[#46B038]"> {form_name}</span>
               </h1>
               <p className="text-gray-600 text-sm">
@@ -164,11 +164,11 @@ const Documents = () => {
                       onClick={() => setSelectedDoc(doc?.form_field.name)}
                       className={`flex items-center gap-3 cursor-pointer px-2 py-1.5 rounded-lg ${
                         selectedDoc === doc.form_field.name
-                          ? "bg-gray-300 font-semibold"
-                          : ""
+                          ? 'bg-gray-300 font-semibold'
+                          : ''
                       }`}
                     >
-                      <p>{doc.form_field.name.split("_").join(" ")}</p>
+                      <p>{doc.form_field.name.split('_').join(' ')}</p>
                       {/* {filledDoc && (
                         <span className="flex items-center justify-center rounded-full bg-[#69CB5C] w-4 h-4">
                           {Check}

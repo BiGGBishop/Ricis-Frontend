@@ -34,7 +34,7 @@ export const applicationApi = createApi({
     addNewApplication: builder.mutation({
       query(payload) {
         return {
-          url: "/application",
+          url: "/users/application/",
           method: "POST",
           body: payload,
         };
