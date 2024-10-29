@@ -36,7 +36,7 @@ const Sidebar = ({
   const dispatch = useDispatch();
   const role = useSelector(selectRole);
   const currentUser = useSelector(selectUser);
-  const isOnline = useNetworkStatus();
+  // const isOnline = useNetworkStatus();
 
   const { isLoading, isSuccess, isError, error, data } = useGetCurrentUserQuery(
     undefined,
@@ -181,12 +181,12 @@ const Sidebar = ({
         </ul>
 
         <div className="text-sm py-8 lg:py-6">
-          {!isOnline && (
+          {/* {!isOnline && (
             <div className="flex items-center gap-2">
               <span>{Offline}</span>
               <span>Offline</span>
             </div>
-          )}
+          )} */}
           <button
             onClick={logout}
             className="flex items-center gap-1 px-6 py-2 bg-blue-800 rounded-md hover:bg-blue-700 transform active:scale-75 transition-transform"
