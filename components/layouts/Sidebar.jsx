@@ -158,74 +158,74 @@ const Sidebar = ({
 
   const hasUserData = role && currentUser;
 
-  return (
-    <aside
-      className={`h-screen bg-[#1A191B] px-2 fixed top-0 w-[12rem] z-[1000] overflow-y-auto lg:block ${showSidebar}`}
-    >
-      <span
-        className="w-12 h-12 lg:hidden ml-32 mt-6"
-        onClick={() => setShowSidebar('hidden')}
-      >
-        {crossIcon}
-      </span>
-      <div className="flex flex-col space-y-3 text-white mt-2">
-        <ul className="lg:mt-28 space-y-3 text-sm">
-          {showLoadingState &&
-            [1, 2, 3, 4, 5].map((loader) => (
-              <div
-                key={loader}
-                className="w-full h-8 rounded-md bg-gray-700 animate-pulse"
-              ></div>
-            ))}
-          {hasUserData && renderLinks()}
-        </ul>
+   return (
+  //   <aside
+  //     className={`h-screen bg-[#1A191B] px-2 fixed top-0 w-[12rem] z-[1000] overflow-y-auto lg:block ${showSidebar}`}
+  //   >
+  //     <span
+  //       className="w-12 h-12 lg:hidden ml-32 mt-6"
+  //       onClick={() => setShowSidebar('hidden')}
+  //     >
+  //       {crossIcon}
+  //     </span>
+  //     <div className="flex flex-col space-y-3 text-white mt-2">
+  //       <ul className="lg:mt-28 space-y-3 text-sm">
+  //         {showLoadingState &&
+  //           [1, 2, 3, 4, 5].map((loader) => (
+  //             <div
+  //               key={loader}
+  //               className="w-full h-8 rounded-md bg-gray-700 animate-pulse"
+  //             ></div>
+  //           ))}
+  //         {hasUserData && renderLinks()}
+  //       </ul>
 
-        <div className="text-sm py-8 lg:py-6">
-          {/* {!isOnline && (
-            <div className="flex items-center gap-2">
-              <span>{Offline}</span>
-              <span>Offline</span>
-            </div>
-          )} */}
-          <button
-            onClick={logout}
-            className="flex items-center gap-1 px-6 py-2 bg-blue-800 rounded-md hover:bg-blue-700 transform active:scale-75 transition-transform"
-          >
-            <span>{LogoutIcon}</span>
-            <span>Logout</span>
-          </button>
-        </div>
+  //       <div className="text-sm py-8 lg:py-6">
+  //         {/* {!isOnline && (
+  //           <div className="flex items-center gap-2">
+  //             <span>{Offline}</span>
+  //             <span>Offline</span>
+  //           </div>
+  //         )} */}
+  //         <button
+  //           onClick={logout}
+  //           className="flex items-center gap-1 px-6 py-2 bg-blue-800 rounded-md hover:bg-blue-700 transform active:scale-75 transition-transform"
+  //         >
+  //           <span>{LogoutIcon}</span>
+  //           <span>Logout</span>
+  //         </button>
+  //       </div>
 
-        {hasUserData && (
-          <div
-            onClick={openProfilePage}
-            className="flex items-center gap-2 cursor-pointer pb-4"
-          >
-            <Avatar currentUser={currentUser} role={role} />
-            <div className="space-y-1">
-              <p className="text-xs">
-                {role !== 'USER'
-                  ? currentUser?.name
-                  : `${currentUser?.first_name} ${currentUser?.last_name}`}
-              </p>
-              <p className="text-xs text-gray-200">
-                {role === 'ADMIN' ? 'Admin' : 'Applicant'}
-              </p>
-            </div>
-          </div>
-        )}
+  //       {hasUserData && (
+  //         <div
+  //           onClick={openProfilePage}
+  //           className="flex items-center gap-2 cursor-pointer pb-4"
+  //         >
+  //           <Avatar currentUser={currentUser} role={role} />
+  //           <div className="space-y-1">
+  //             <p className="text-xs">
+  //               {role !== 'USER'
+  //                 ? currentUser?.name
+  //                 : `${currentUser?.first_name} ${currentUser?.last_name}`}
+  //             </p>
+  //             <p className="text-xs text-gray-200">
+  //               {role === 'ADMIN' ? 'Admin' : 'Applicant'}
+  //             </p>
+  //           </div>
+  //         </div>
+  //       )}
 
-        {showLoadingState && (
-          <div className="fixed bottom-6 flex justify-center items-center gap-2 cursor-pointer">
-            <div className="w-10 h-10 rounded-full animate-pulse bg-gray-700"></div>
-            <div className="space-y-2">
-              <p className="w-12 h-2 animate-pulse bg-gray-700"></p>
-              <p className="w-24 h-3 animate-pulse bg-gray-700"></p>
-            </div>
-          </div>
-        )}
-      </div>
-    </aside>
+  //       {showLoadingState && (
+  //         <div className="fixed bottom-6 flex justify-center items-center gap-2 cursor-pointer">
+  //           <div className="w-10 h-10 rounded-full animate-pulse bg-gray-700"></div>
+  //           <div className="space-y-2">
+  //             <p className="w-12 h-2 animate-pulse bg-gray-700"></p>
+  //             <p className="w-24 h-3 animate-pulse bg-gray-700"></p>
+  //           </div>
+  //         </div>
+  //       )}
+  //     </div>
+  //   </aside>
   );
 };
 export default Sidebar;
