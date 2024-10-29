@@ -1,9 +1,8 @@
 'use client';
-import { Suspense, useState } from 'react';
+
+import { useState } from 'react';
 import DashboardLayout from '@/components/layouts/DashboardLayout';
-import ApplicationForm from './ApplicationForm';
 import WithAuth from '@/components/withAuth';
-import { Checkbox } from '@/components/ui/checkbox';
 import Btn from '@/components/Btn';
 import FPI from '../FPI';
 import { useRouter } from 'next/navigation';
@@ -14,6 +13,13 @@ import {
 } from '@/store/api/categoriesApi';
 import { ClipLoader } from 'react-spinners';
 import { toast } from 'react-toastify';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 const NewApplication = () => {
   const router = useRouter();
@@ -28,127 +34,86 @@ const NewApplication = () => {
   const subCategories = subCategoriesData?.data;
   const classifications = classificationsData?.data;
 
-  const [checkedCategories, setCheckedCategories] = useState([]);
-  const [checkedSubCategories, setCheckedSubCategories] = useState([]);
-  const [checkedClassifications, setCheckedClassifications] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState('');
+  const [selectedSubCategory, setSelectedSubCategory] = useState('');
+  const [selectedClassification, setSelectedClassification] = useState('');
 
-  const handleCheckboxChange = (value, type) => {
+  const handleSelectionChange = (value, type) => {
     switch (type) {
       case 'category':
-        if (!checkedCategories.includes(value)) {
-          setCheckedCategories([...checkedCategories, value]);
-        } else {
-          setCheckedCategories(
-            checkedCategories.filter((item) => item !== value)
-          );
-        }
+        setSelectedCategory(value);
         break;
       case 'subcategory':
-        if (!checkedSubCategories.includes(value)) {
-          setCheckedSubCategories([...checkedSubCategories, value]);
-        } else {
-          setCheckedSubCategories(
-            checkedSubCategories.filter((item) => item !== value)
-          );
-        }
+        setSelectedSubCategory(value);
         break;
       case 'classification':
-        if (!checkedClassifications.includes(value)) {
-          setCheckedClassifications([...checkedClassifications, value]);
-        } else {
-          setCheckedClassifications(
-            checkedClassifications.filter((item) => item !== value)
-          );
-        }
+        setSelectedClassification(value);
         break;
     }
   };
 
   const validateSelections = () => {
     const missingSelections = [];
-
-    if (checkedCategories.length === 0) {
-      missingSelections.push('Categories');
-    }
-    if (checkedSubCategories.length === 0) {
-      missingSelections.push('Sub Categories');
-    }
-    if (checkedClassifications.length === 0) {
-      missingSelections.push('Classifications');
-    }
-
+    if (!selectedCategory) missingSelections.push('Category');
+    if (!selectedSubCategory) missingSelections.push('Sub Category');
+    if (!selectedClassification) missingSelections.push('Classification');
     return missingSelections;
   };
+
+  localStorage.setItem('checkedCategories', selectedCategory);
+  localStorage.setItem('checkedSubCategories', selectedSubCategory);
+  localStorage.setItem('checkedClassifications', selectedClassification);
 
   const navigateToNextStep = () => {
     const missingSelections = validateSelections();
 
     if (missingSelections.length > 0) {
       toast.error(
-        `Please select at least one item from: ${missingSelections.join(', ')}`,
+        `Please select at least one of the following: ${missingSelections.join(
+          ', '
+        )}`,
         {
           autoClose: 5000,
-          // position: 'top-right',
         }
       );
       return;
     }
-
-    const params = {
-      categories: checkedCategories.join(','),
-      subcategories: checkedSubCategories.join(','),
-      classifications: checkedClassifications.join(','),
-    };
-    console.log(params);
-    const queryString = new URLSearchParams(params).toString();
-    router.push(`/user/application-type?${queryString}`);
+    router.push('/user/application-type');
   };
 
-  const CategorySection = ({ title, items, checkedItems, type, isLoading }) => (
+  const SelectionSection = ({ title, items, value, type, isLoading }) => (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h3 className="font-semibold text-gray-500">{title}</h3>
-        <span className="text-sm text-gray-500">
-          {checkedItems.length} selected
-        </span>
       </div>
-      <div className="border rounded-lg overflow-hidden">
-        <div className="max-h-80 overflow-y-auto p-4">
-          {isLoading ? (
-            <div className="flex justify-center p-4">
-              <ClipLoader size={40} />
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+      <div className="w-full">
+        {isLoading ? (
+          <div className="flex justify-center p-4">
+            <ClipLoader size={40} />
+          </div>
+        ) : (
+          <Select
+            value={value}
+            onValueChange={(newValue) => handleSelectionChange(newValue, type)}
+          >
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder={`Select ${title}`} />
+            </SelectTrigger>
+            <SelectContent>
               {items?.map((item) => (
-                <div
-                  key={item.id}
-                  className="flex items-start gap-3 bg-gray-50 p-3 rounded-lg hover:bg-gray-100 transition-colors"
-                >
-                  <Checkbox
-                    value={item.id}
-                    checked={checkedItems.includes(item.id)}
-                    onCheckedChange={() => handleCheckboxChange(item.id, type)}
-                    className="mt-1"
-                  />
-                  <label className="text-sm font-medium leading-tight cursor-pointer">
-                    {item.name || item.classification_name}
-                  </label>
-                </div>
+                <SelectItem key={item.id} value={item.id}>
+                  {item.name || item.classification_name}
+                </SelectItem>
               ))}
-            </div>
-          )}
-        </div>
+            </SelectContent>
+          </Select>
+        )}
       </div>
     </div>
   );
 
   const isLoading =
     isLoadingCategories || isLoadingSubCategories || isLoadingClassifications;
-  const hasAllSelections =
-    checkedCategories.length > 0 &&
-    checkedSubCategories.length > 0 &&
-    checkedClassifications.length > 0;
 
   return (
     <DashboardLayout header="New Application" icon="">
@@ -157,7 +122,7 @@ const NewApplication = () => {
           <h1 className="font-semibold text-lg">New Application</h1>
           <p className="text-sm">Select your preferred application category</p>
           <p className="text-sm text-gray-500 mt-1">
-            * All sections require at least one selection
+            * All selections are required
           </p>
         </div>
 
@@ -169,26 +134,26 @@ const NewApplication = () => {
           <h2 className="text-[#46B038] font-medium">APPLICATION DETAILS</h2>
 
           <div className="space-y-6">
-            <CategorySection
-              title="Categories *"
+            <SelectionSection
+              title="Category *"
               items={categories}
-              checkedItems={checkedCategories}
+              value={selectedCategory}
               type="category"
               isLoading={isLoadingCategories}
             />
 
-            <CategorySection
-              title="Sub Categories *"
+            <SelectionSection
+              title="Sub Category *"
               items={subCategories}
-              checkedItems={checkedSubCategories}
+              value={selectedSubCategory}
               type="subcategory"
               isLoading={isLoadingSubCategories}
             />
 
-            <CategorySection
-              title="Classifications *"
+            <SelectionSection
+              title="Classification *"
               items={classifications}
-              checkedItems={checkedClassifications}
+              value={selectedClassification}
               type="classification"
               isLoading={isLoadingClassifications}
             />

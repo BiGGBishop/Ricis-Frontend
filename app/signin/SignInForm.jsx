@@ -42,6 +42,28 @@ const SignInForm = ({ heading, as_staff }) => {
   const router = useRouter();
   const dispatch = useDispatch();
 
+  const handleAuthSuccess = async (userData, token, userRole, redirectPath) => {
+    try {
+      // First set all the necessary data
+      setToken(token);
+      dispatch(setUser(userData));
+      dispatch(setRole(userRole));
+      setLoginTime();
+
+      // Small delay to ensure token is set before redirect
+      await new Promise((resolve) => setTimeout(resolve, 100));
+
+      // Show success message
+      toast.success('Login successful!', { autoClose: 1000 });
+
+      // Finally redirect
+      router.replace(redirectPath);
+    } catch (err) {
+      console.error('Auth success handling error:', err);
+      toast.error('Something went wrong during login');
+    }
+  };
+
   const handleSignIn = async () => {
     try {
       const IsInValid = validator.whiteSpaces(formData);
@@ -50,13 +72,16 @@ const SignInForm = ({ heading, as_staff }) => {
         toast.warning('Enter valid credentials!', { autoClose: 30000 });
         return;
       }
+
       if (!as_staff) {
+
         await signInUser(formData);
       } else {
         await signInStaff(formData);
       }
     } catch (error) {
       console.log('error', error);
+
       const err = normalizeErrors(error);
       toast.error(err, { autoClose: 30000 });
     }
@@ -104,10 +129,11 @@ const SignInForm = ({ heading, as_staff }) => {
     dispatch,
   ]);
 
+
   return (
     <FormLayout>
       <div className="w-full lg:w-[32rem] px-4 mx-auto mt-8 space-y-8">
-        <div className="bg-white rounded-[12px] py-[3rem] lg:px-[3rem] px-4 border border-[#E6E8EC] space-y-8  ">
+        <div className="bg-white rounded-[12px] py-[3rem] lg:px-[3rem] px-4 border border-[#E6E8EC] space-y-8">
           <div className="flex items-center gap-1">
             <span onClick={() => router.back()} className="cursor-pointer">
               {ArrowLeft}
@@ -133,13 +159,13 @@ const SignInForm = ({ heading, as_staff }) => {
             />
             <Link
               href="/reset-password"
-              className="inter600 text-[12px] text-center leading-[18px] text-[#0000008A] "
+              className="inter600 text-[12px] text-center leading-[18px] text-[#0000008A]"
             >
               Forgot Password?
             </Link>
           </div>
 
-          <div className="mt-[2.5rem] flex flex-col  space-y-[18px] w-full ">
+          <div className="mt-[2.5rem] flex flex-col space-y-[18px] w-full">
             <Btn
               text="Login"
               handleClick={handleSignIn}
@@ -147,8 +173,8 @@ const SignInForm = ({ heading, as_staff }) => {
               disabled={disableBtn}
               loadingMsg="Hold on..."
             />
-            <h2 className="text-[12px] leading-[14px] text-[#3361FF] inter600 text-center ">
-              <Link href="/signup">Dont have an account? Sign up </Link>
+            <h2 className="text-[12px] leading-[14px] text-[#3361FF] inter600 text-center">
+              <Link href="/signup">Dont have an account? Sign up</Link>
             </h2>
           </div>
         </div>
