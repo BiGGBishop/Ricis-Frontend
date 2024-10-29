@@ -102,10 +102,16 @@ const Sidebar = ({
     }
   }, []);
 
+  // In Sidebar.js
   useEffect(() => {
-    if (!getToken()) {
-      router.replace('/');
-    }
+    // Add a small delay to prevent immediate redirect
+    const checkToken = setTimeout(() => {
+      if (!getToken()) {
+        router.replace('/');
+      }
+    }, 500);
+
+    return () => clearTimeout(checkToken);
   }, [router]);
 
   const renderLinks = () => {
