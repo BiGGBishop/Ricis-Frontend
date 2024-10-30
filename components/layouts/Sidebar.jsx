@@ -102,12 +102,12 @@ const Sidebar = ({
   //   }
   // }, []);
 
+
   // useEffect(() => {
   //   if (!getToken()) {
   //     router.replace('/');
   //   }
   // }, [router]);
-
   const renderLinks = () => {
     if (!role) return null;
 
@@ -158,7 +158,7 @@ const Sidebar = ({
 
   const hasUserData = role && currentUser;
 
-  return (
+   return (
     <aside
       className={`h-screen bg-[#1A191B] px-2 fixed top-0 w-[12rem] z-[1000] overflow-y-auto lg:block ${showSidebar}`}
     >
@@ -228,5 +228,4 @@ const Sidebar = ({
     </aside>
   );
 };
-
 export default Sidebar;
