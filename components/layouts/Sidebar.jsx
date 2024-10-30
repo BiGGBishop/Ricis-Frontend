@@ -102,11 +102,11 @@ const Sidebar = ({
   //   }
   // }, []);
 
-  useEffect(() => {
-    if (!getToken()) {
-      router.replace('/');
-    }
-  }, [router]);
+  // useEffect(() => {
+  //   if (!getToken()) {
+  //     router.replace('/');
+  //   }
+  // }, [router]);
 
   const renderLinks = () => {
     if (!role) return null;
