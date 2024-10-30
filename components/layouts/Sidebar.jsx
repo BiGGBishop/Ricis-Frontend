@@ -42,7 +42,7 @@ const Sidebar = ({
     undefined,
     {
       refetchOnMountOrArgChange: true,
-      skip: !getToken(),
+      // skip: !getToken(),
     }
   );
 
@@ -81,7 +81,7 @@ const Sidebar = ({
   const logout = () => {
     dispatch(clearUser());
     router.replace('/');
-    removeToken();
+    // removeToken();
     removeLoginTime();
   };
 
@@ -102,18 +102,12 @@ const Sidebar = ({
   //   }
   // }, []);
 
-  // In Sidebar.js
-  useEffect(() => {
-    // Add a small delay to prevent immediate redirect
-    const checkToken = setTimeout(() => {
-      if (!getToken()) {
-        router.replace('/');
-      }
-    }, 500);
 
-    return () => clearTimeout(checkToken);
-  }, [router]);
-
+  // useEffect(() => {
+  //   if (!getToken()) {
+  //     router.replace('/');
+  //   }
+  // }, [router]);
   const renderLinks = () => {
     if (!role) return null;
 

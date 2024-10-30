@@ -9,6 +9,7 @@ import ProgressBar from "@/components/ProgressBar";
 import ApplicationsProvider from "@/components/contexts/applicationsProvider";
 import UserProvider from "@/components/contexts/userProvider";
 import TransactionsProvider from "@/components/contexts/transactionsProvider";
+import { SessionProvider } from "next-auth/react";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -21,6 +22,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body className={`${inter.className}`}>
+        <SessionProvider>
         <ProgressBar />
         <Provider store={store}>
           <UserProvider>
@@ -38,7 +40,8 @@ export default function RootLayout({ children }) {
             closeOnClick
             closeButton={true}
           />
-        </Provider>
+          </Provider>
+          </SessionProvider>
       </body>
     </html>
   );

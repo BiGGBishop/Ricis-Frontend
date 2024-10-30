@@ -74,10 +74,36 @@ const SignInForm = ({ heading, as_staff }) => {
       }
 
       if (!as_staff) {
-
         await signInUser(formData);
+        if (error) {
+          const err = normalizeErrors(error);
+          toast.error(err, { autoClose: 30000 });
+        }
+        if (isSuccess) {
+          toast.success(data?.message, { autoClose: 1000 });
+          router.replace('/user');
+          setToken(data?.data?.token);
+          dispatch(setUser(data?.data?.user));
+          dispatch(setRole('USER'));
+          setLoginTime();
+        }
       } else {
         await signInStaff(formData);
+        if (isSuccessStaff) {
+          toast.success(dataStaff?.message, { autoClose: 1000 });
+          router.replace('/admin');
+          setToken(dataStaff?.data?.token);
+          dispatch(setUser(dataStaff?.data?.user));
+          dispatch(
+            setRole(dataStaff?.data?.user?.userroleId === 1 ? 'ADMIN' : 'STAFF')
+          );
+          setLoginTime();
+        }
+        if (errorStaff) {
+          console.log('errorStaff', errorStaff);
+          const err = normalizeErrors(errorStaff);
+          toast.error(err, { autoClose: 30000 });
+        }
       }
     } catch (error) {
       console.log('error', error);
@@ -108,7 +134,7 @@ const SignInForm = ({ heading, as_staff }) => {
         setToken(dataStaff?.data?.token);
         dispatch(
           setRole(dataStaff?.data?.user?.userroleId === 1 ? 'ADMIN' : 'STAFF')
-        );
+        )
         setLoginTime();
         router.push('/admin');
       }
