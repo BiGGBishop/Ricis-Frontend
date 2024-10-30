@@ -81,26 +81,26 @@ const Sidebar = ({
   const logout = () => {
     dispatch(clearUser());
     router.replace('/');
-    removeToken();
+    // removeToken();
     removeLoginTime();
   };
 
-  useEffect(() => {
-    const loginTime = getLoginTime();
-    if (loginTime) {
-      const twentyFourHours = 24 * 60 * 60 * 1000;
-      const checkExpiry = () => {
-        const currentTime = new Date().getTime();
-        const elapsedTime = currentTime - parseInt(loginTime, 10);
-        if (elapsedTime >= twentyFourHours) {
-          logout();
-        }
-      };
-      checkExpiry();
-      const interval = setInterval(checkExpiry, 60000);
-      return () => clearInterval(interval);
-    }
-  }, []);
+  // useEffect(() => {
+  //   const loginTime = getLoginTime();
+  //   if (loginTime) {
+  //     const twentyFourHours = 24 * 60 * 60 * 1000;
+  //     const checkExpiry = () => {
+  //       const currentTime = new Date().getTime();
+  //       const elapsedTime = currentTime - parseInt(loginTime, 10);
+  //       if (elapsedTime >= twentyFourHours) {
+  //         logout();
+  //       }
+  //     };
+  //     checkExpiry();
+  //     const interval = setInterval(checkExpiry, 60000);
+  //     return () => clearInterval(interval);
+  //   }
+  // }, []);
 
   useEffect(() => {
     if (!getToken()) {
