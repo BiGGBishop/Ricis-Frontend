@@ -14,7 +14,7 @@ export const authApi = createApi({
   baseQuery: fetchBaseQuery({
     baseUrl,
     prepareHeaders: (headers, { getState }) => {
-      // const token = getToken(); // Get the token
+      const token = getToken(); 
       // const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NCwiZW1haWwiOiJzdXBlcmFkbWluQG1haWxpbmF0b3IuY29tIiwiaWF0IjoxNzI5OTM4MzYxLCJleHAiOjE3MzAxOTc1NjF9.X1nDX7k3MfzchGab0Hol72UB1-0zUaJNjF5-8tdA5ow"
       // console.log("token", token);
       // if (token) {

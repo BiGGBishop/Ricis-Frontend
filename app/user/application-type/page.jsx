@@ -16,7 +16,10 @@ import PaymentModal from '@/components/modals/paymentModal';
 
 const ApplicationFormFields = () => {
   const router = useRouter();
-  const [addNewApplication, { isLoading }] = useAddNewApplicationMutation();
+  const [addNewApplication] = useAddNewApplicationMutation();
+
+  const [isDraftSaving, setIsDraftSaving] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const formFields = [
     { id: 1, name: 'equipment_incidental', type: 'SHORT_TEXT', required: true },
@@ -36,11 +39,9 @@ const ApplicationFormFields = () => {
     },
     { id: 11, name: 'equipment_type', type: 'SHORT_TEXT', required: true },
     { id: 12, name: 'mawp_or_mdmt', type: 'SHORT_TEXT', required: true },
-
     { id: 14, name: 'design_presure', type: 'SHORT_TEXT', required: true },
     { id: 15, name: 'operating_medium', type: 'SHORT_TEXT', required: true },
     { id: 16, name: 'equipment_line', type: 'NUMBER', required: true },
-
     { id: 19, name: 'manufacturer', type: 'SHORT_TEXT', required: true },
     { id: 20, name: 'new_or_used', type: 'SHORT_TEXT', required: true },
     {
@@ -132,7 +133,6 @@ const ApplicationFormFields = () => {
     'errorFields'
   );
   const [showPaymentModal, setShowPaymentModal] = useState(false);
-  const [submittedApplicationId, setSubmittedApplicationId] = useState(null);
 
   const [savedCategories, setSavedCategories] = useState({
     categories: [],
@@ -150,6 +150,7 @@ const ApplicationFormFields = () => {
     const classifications = JSON.parse(
       localStorage.getItem('checkedClassifications') || '[]'
     );
+    console.log(categories, subCategories, classifications);
     setSavedCategories({
       categories,
       subCategories,
@@ -158,19 +159,33 @@ const ApplicationFormFields = () => {
   }, []);
 
   const handleSubmit = async (isDraft = false) => {
-    // For draft, only validate non-empty fields
-    // For final submission, validate all fields
-    const dataToValidate = isDraft ? removeEmptyFields(formData) : formData;
-    const validate = validateForm(dataToValidate);
+    try {
+      // Set the appropriate loading state
+      if (isDraft) {
+        setIsDraftSaving(true);
+      } else {
+        setIsSubmitting(true);
+      }
 
-    if (validate) {
+      const dataToValidate = isDraft ? removeEmptyFields(formData) : formData;
+      const validate = validateForm(dataToValidate);
+
+      if (!validate) {
+        toast.error(
+          isDraft
+            ? 'Fill entered fields correctly'
+            : "You're required to correctly fill all fields before you proceed.",
+          { autoClose: isDraft ? 20000 : 10000 }
+        );
+        return;
+      }
+
       const formFieldTypesObj = JSON.parse(localStorage.getItem('errorFields'));
       const transformedFormData = convertToValidNumberType(
         dataToValidate,
         formFieldTypesObj
       );
 
-      // Create payload matching backend expectations
       const payload = {
         save_as_draft: isDraft,
         category: parseInt(savedCategories.categories[0], 10),
@@ -178,30 +193,24 @@ const ApplicationFormFields = () => {
         classifications: parseInt(savedCategories.classifications[0], 10),
         ...transformedFormData,
       };
-      try {
-        await addNewApplication(payload).unwrap();
-        toast.success(
-          isDraft
-            ? 'Draft saved successfully!'
-            : 'Application submitted successfully!'
-        );
 
-        setShowPaymentModal(true);
+      await addNewApplication(payload).unwrap();
 
-        // router.push(isDraft ? '/user/drafts' : '/user/preview');
-      } catch (error) {
-        toast.error(
-          error?.error.message ||
-            'An error occurred while saving the application'
-        );
-      }
-    } else {
-      toast.error(
+      toast.success(
         isDraft
-          ? 'Fill entered fields correctly'
-          : "You're required to correctly fill all fields before you proceed.",
-        { autoClose: isDraft ? 20000 : 10000 }
+          ? 'Draft saved successfully!'
+          : 'Application submitted successfully!'
       );
+
+      setShowPaymentModal(true);
+    } catch (error) {
+      toast.error(
+        error?.error?.message ||
+          'An error occurred while saving the application'
+      );
+    } finally {
+      setIsDraftSaving(false);
+      setIsSubmitting(false);
     }
   };
 
@@ -288,19 +297,19 @@ const ApplicationFormFields = () => {
                 <button
                   type="button"
                   onClick={() => handleSubmit(true)}
-                  disabled={isLoading}
+                  disabled={isDraftSaving || isSubmitting}
                   className="w-full lg:w-fit px-4 py-2 border border-[#46B038] text-gray-600 rounded-md hover:opacity-70 transform active:scale-75 transition-transform disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {isLoading ? 'Saving...' : 'Save as Draft'}
+                  {isDraftSaving ? 'Saving...' : 'Save as Draft'}
                 </button>
               </div>
               <button
                 type="button"
                 onClick={() => handleSubmit(false)}
-                disabled={isLoading}
+                disabled={isDraftSaving || isSubmitting}
                 className="w-full lg:w-fit lg:px-8 px-6 py-2 bg-[#46B038] hover:opacity-70 text-white rounded-md disabled:cursor-not-allowed disabled:opacity-70 transform active:scale-75 transition-transform"
               >
-                {isLoading ? 'Submitting...' : 'Next'}
+                {isSubmitting ? 'Submitting...' : 'Next'}
               </button>
             </div>
           </div>
